@@ -110,7 +110,7 @@
     .bar {
       width: 3.5px;
       height: 100%;
-      background: linear-gradient(180deg, #38bdf8, var(--dynamic-accent), #f43f5e);
+      background: linear-gradient(180deg, rgba(255,255,255,0.8), var(--dynamic-accent), rgba(255,255,255,0.2));
       border-radius: 99px;
       animation: pulse-fast 0.6s ease-in-out infinite alternate;
       will-change: transform;
@@ -380,7 +380,7 @@
     }
 
     @media (max-width: 768px) {
-      #interactive-bg { opacity: 0.85; filter: saturate(0.8); }
+      #interactive-bg { opacity: 0.85; filter: saturate(0.85); }
     }
 
     @media (max-height: 600px) {
@@ -462,8 +462,8 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      let targetHueOffset = 0;
-      let currentHueOffset = 0;
+      let targetHueOffset = 200; // Domyślny odcień startowy
+      let currentHueOffset = 200;
 
       const canvas = document.getElementById('interactive-bg');
       if (canvas) {
@@ -493,18 +493,18 @@
         window.addEventListener('touchstart', updatePointer, { passive: true });
         window.addEventListener('touchmove', updatePointer, { passive: true });
 
+        // Punkty tła używają przesunięć bazujących WYŁĄCZNIE na tym samym kolorze co okładka (wyciągniętym hue)
         const blobs = [
-          { x: width * 0.3, y: height * 0.3, radius: 420, baseHue: 260, speed: 0.0012, factor: 0.25 },
-          { x: width * 0.7, y: height * 0.6, radius: 460, baseHue: 320, speed: 0.0009, factor: -0.25 },
-          { x: width * 0.5, y: height * 0.4, radius: 380, baseHue: 190, speed: 0.0015, factor: 0.30 },
-          { x: width * 0.2, y: height * 0.8, radius: 400, baseHue: 20, speed: 0.0008, factor: -0.20 }
+          { x: width * 0.3, y: height * 0.3, radius: 440, hueShift: 0, speed: 0.0012, factor: 0.25 },
+          { x: width * 0.7, y: height * 0.6, radius: 480, hueShift: 15, speed: 0.0009, factor: -0.25 },
+          { x: width * 0.5, y: height * 0.4, radius: 400, hueShift: -15, speed: 0.0015, factor: 0.30 },
+          { x: width * 0.2, y: height * 0.8, radius: 420, hueShift: 5, speed: 0.0008, factor: -0.20 }
         ];
 
         let time = 0;
         function renderCanvas() {
           time += 1;
 
-          // Automatyczna animacja falowania tła, jeśli użytkownik nie dotyka/porusza ekranu
           if (!isTouching) {
             mouse.targetX = width / 2 + Math.sin(time * 0.012) * (width * 0.35);
             mouse.targetY = height / 2 + Math.cos(time * 0.008) * (height * 0.35);
@@ -512,7 +512,7 @@
 
           mouse.x += (mouse.targetX - mouse.x) * 0.05;
           mouse.y += (mouse.targetY - mouse.y) * 0.05;
-          currentHueOffset += (targetHueOffset - currentHueOffset) * 0.015;
+          currentHueOffset += (targetHueOffset - currentHueOffset) * 0.02;
 
           ctx.clearRect(0, 0, width, height);
           ctx.fillStyle = '#050608';
@@ -527,9 +527,10 @@
             const currentX = (blob.x + orbitX + mouseOffsetX);
             const currentY = (blob.y + orbitY + mouseOffsetY);
 
-            const hue = (blob.baseHue + currentHueOffset + Math.sin(time * 0.001 + index) * 20) % 360;
-            const colorCenter = `hsla(${hue}, 85%, 52%, 0.42)`;
-            const colorEdge = `hsla(${hue}, 85%, 52%, 0)`;
+            // Pobieranie koloru WYŁĄCZNIE na podstawie wyciągniętej wartości barwy z okładki
+            const hue = (currentHueOffset + blob.hueShift + 360) % 360;
+            const colorCenter = `hsla(${hue}, 75%, 48%, 0.38)`;
+            const colorEdge = `hsla(${hue}, 75%, 48%, 0)`;
 
             const gradient = ctx.createRadialGradient(currentX, currentY, 0, currentX, currentY, blob.radius);
             gradient.addColorStop(0, colorCenter);
