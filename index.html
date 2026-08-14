@@ -37,7 +37,7 @@
       overflow: hidden;
     }
 
-    #interactive-bg, #noise-bg, #strobe-container {
+    #interactive-bg, #strobe-container {
       position: fixed;
       top: 0;
       left: 0;
@@ -65,25 +65,6 @@
       transform: translate(-50%, -50%);
       transition: opacity 0.06s ease-out;
       will-change: opacity;
-    }
-
-    #noise-bg {
-      z-index: 3;
-      opacity: 0.06;
-      mix-blend-mode: overlay;
-    }
-
-    .overlay-texture {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100dvh;
-      z-index: 4;
-      pointer-events: none;
-      background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 0);
-      background-size: 24px 24px;
-      opacity: 0.6;
     }
 
     .container {
@@ -399,8 +380,7 @@
     }
 
     @media (max-width: 768px) {
-      #noise-bg { display: none; }
-      #interactive-bg { opacity: 0.65; filter: saturate(0.65); }
+      #interactive-bg { opacity: 0.85; filter: saturate(0.8); }
     }
 
     @media (max-height: 600px) {
@@ -412,8 +392,6 @@
 <body>
   <canvas id="interactive-bg"></canvas>
   <div id="strobe-container"></div>
-  <canvas id="noise-bg"></canvas>
-  <div class="overlay-texture"></div>
 
   <div class="container">
     <div class="header-spacer"></div>
@@ -493,6 +471,7 @@
         let width = canvas.width = window.innerWidth;
         let height = canvas.height = window.innerHeight;
         let mouse = { x: width / 2, y: height / 2, targetX: width / 2, targetY: height / 2 };
+        let isTouching = false;
 
         window.addEventListener('resize', () => {
           width = canvas.width = window.innerWidth;
@@ -500,26 +479,37 @@
         });
 
         function updatePointer(e) {
-          const x = e.clientX || (e.touches && e.touches[0].clientX);
-          const y = e.clientY || (e.touches && e.touches[0].clientY);
+          let touch = e.touches ? e.touches[0] : null;
+          const x = touch ? touch.clientX : e.clientX;
+          const y = touch ? touch.clientY : e.clientY;
           if (x !== undefined && y !== undefined) {
             mouse.targetX = x;
             mouse.targetY = y;
+            isTouching = true;
           }
         }
 
         window.addEventListener('mousemove', updatePointer);
-        window.addEventListener('touchmove', updatePointer);
+        window.addEventListener('touchstart', updatePointer, { passive: true });
+        window.addEventListener('touchmove', updatePointer, { passive: true });
 
         const blobs = [
-          { x: width * 0.3, y: height * 0.3, radius: 420, baseHue: 260, speed: 0.0006, factor: 0.15 },
-          { x: width * 0.7, y: height * 0.6, radius: 460, baseHue: 320, speed: 0.0005, factor: -0.15 },
-          { x: width * 0.5, y: height * 0.4, radius: 380, baseHue: 190, speed: 0.0008, factor: 0.20 },
-          { x: width * 0.2, y: height * 0.8, radius: 400, baseHue: 20, speed: 0.0004, factor: -0.12 }
+          { x: width * 0.3, y: height * 0.3, radius: 420, baseHue: 260, speed: 0.0012, factor: 0.25 },
+          { x: width * 0.7, y: height * 0.6, radius: 460, baseHue: 320, speed: 0.0009, factor: -0.25 },
+          { x: width * 0.5, y: height * 0.4, radius: 380, baseHue: 190, speed: 0.0015, factor: 0.30 },
+          { x: width * 0.2, y: height * 0.8, radius: 400, baseHue: 20, speed: 0.0008, factor: -0.20 }
         ];
 
         let time = 0;
         function renderCanvas() {
+          time += 1;
+
+          // Automatyczna animacja falowania tła, jeśli użytkownik nie dotyka/porusza ekranu
+          if (!isTouching) {
+            mouse.targetX = width / 2 + Math.sin(time * 0.012) * (width * 0.35);
+            mouse.targetY = height / 2 + Math.cos(time * 0.008) * (height * 0.35);
+          }
+
           mouse.x += (mouse.targetX - mouse.x) * 0.05;
           mouse.y += (mouse.targetY - mouse.y) * 0.05;
           currentHueOffset += (targetHueOffset - currentHueOffset) * 0.015;
@@ -528,19 +518,18 @@
           ctx.fillStyle = '#050608';
           ctx.fillRect(0, 0, width, height);
 
-          time += 1;
           blobs.forEach((blob, index) => {
-            const orbitX = Math.sin(time * blob.speed + index * 2) * (width * 0.15);
-            const orbitY = Math.cos(time * blob.speed * 0.8 + index) * (height * 0.15);
+            const orbitX = Math.sin(time * blob.speed + index * 2) * (width * 0.25);
+            const orbitY = Math.cos(time * blob.speed * 0.8 + index) * (height * 0.25);
             const mouseOffsetX = (mouse.x - width / 2) * blob.factor;
             const mouseOffsetY = (mouse.y - height / 2) * blob.factor;
 
             const currentX = (blob.x + orbitX + mouseOffsetX);
             const currentY = (blob.y + orbitY + mouseOffsetY);
 
-            const hue = (blob.baseHue + currentHueOffset + Math.sin(time * 0.0005 + index) * 20) % 360;
-            const colorCenter = `hsla(${hue}, 80%, 50%, 0.35)`;
-            const colorEdge = `hsla(${hue}, 80%, 50%, 0)`;
+            const hue = (blob.baseHue + currentHueOffset + Math.sin(time * 0.001 + index) * 20) % 360;
+            const colorCenter = `hsla(${hue}, 85%, 52%, 0.42)`;
+            const colorEdge = `hsla(${hue}, 85%, 52%, 0)`;
 
             const gradient = ctx.createRadialGradient(currentX, currentY, 0, currentX, currentY, blob.radius);
             gradient.addColorStop(0, colorCenter);
@@ -597,34 +586,6 @@
         }
 
         setTimeout(triggerMultiFlash, 1500);
-      }
-
-      const noiseCanvas = document.getElementById('noise-bg');
-      if (noiseCanvas && window.innerWidth > 768) {
-        const nCtx = noiseCanvas.getContext('2d');
-        let nWidth = noiseCanvas.width = window.innerWidth / 2;
-        let nHeight = noiseCanvas.height = window.innerHeight / 2;
-
-        window.addEventListener('resize', () => {
-          nWidth = noiseCanvas.width = window.innerWidth / 2;
-          nHeight = noiseCanvas.height = window.innerHeight / 2;
-        });
-
-        function generateNoise() {
-          const imgData = nCtx.createImageData(nWidth, nHeight);
-          const buffer = new Uint32Array(imgData.data.buffer);
-          const len = buffer.length;
-
-          for (let i = 0; i < len; i++) {
-            if (Math.random() < 0.12) {
-              buffer[i] = 0xffffffff;
-            }
-          }
-
-          nCtx.putImageData(imgData, 0, 0);
-          setTimeout(generateNoise, 80);
-        }
-        generateNoise();
       }
 
       function extractDominantHue(imgElement) {
