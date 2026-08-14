@@ -30,11 +30,12 @@
 
     html, body {
       width: 100%;
-      height: 100dvh;
+      min-height: 100dvh;
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       background-color: var(--bg-dark);
       color: var(--text-main);
-      overflow: hidden;
+      overflow-y: auto;
+      overflow-x: hidden;
     }
 
     #interactive-bg, #strobe-container {
@@ -71,14 +72,14 @@
       position: relative;
       z-index: 5;
       width: 100%;
-      height: 100dvh;
+      min-height: 100dvh;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
-      padding: clamp(12px, 2.5vh, 24px) 20px;
-      padding-top: max(clamp(12px, 2.5vh, 24px), env(safe-area-inset-top));
-      padding-bottom: max(clamp(12px, 2.5vh, 24px), env(safe-area-inset-bottom));
+      padding: clamp(20px, 3vh, 32px) 20px;
+      padding-top: max(clamp(20px, 3vh, 32px), env(safe-area-inset-top));
+      padding-bottom: max(clamp(20px, 3vh, 32px), env(safe-area-inset-bottom));
       perspective: 1000px;
     }
 
@@ -93,6 +94,7 @@
       flex-direction: column;
       align-items: center;
       gap: clamp(14px, 2.5vh, 22px);
+      margin: auto 0;
     }
 
     .sound-wave {
@@ -366,6 +368,7 @@
 
     footer {
       text-align: center;
+      margin-top: 20px;
     }
 
     .footer-text {
@@ -386,7 +389,6 @@
 
     @media (max-height: 600px) {
       .sound-wave { display: none; }
-      .main-content { gap: 12px; }
     }
   </style>
 </head>
@@ -475,6 +477,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       let targetHueOffset = 200; 
       let currentHueOffset = 200;
+      let isGrayscale = false;
 
       const canvas = document.getElementById('interactive-bg');
       if (canvas) {
@@ -504,7 +507,6 @@
         window.addEventListener('touchstart', updatePointer, { passive: true });
         window.addEventListener('touchmove', updatePointer, { passive: true });
 
-        // Uprościłem hueShift na 0, aby kolor był w 100% zgodny z okładką
         const blobs = [
           { x: width * 0.3, y: height * 0.3, radius: 440, hueShift: 0, speed: 0.0012, factor: 0.25 },
           { x: width * 0.7, y: height * 0.6, radius: 480, hueShift: 0, speed: 0.0009, factor: -0.25 },
@@ -539,9 +541,16 @@
             const currentY = (blob.y + orbitY + mouseOffsetY);
 
             const hue = (currentHueOffset + blob.hueShift + 360) % 360;
-            // Bardziej intensywne, nasycone kolory dopasowane do okładki
-            const colorCenter = `hsla(${hue}, 85%, 55%, 0.45)`;
-            const colorEdge = `hsla(${hue}, 85%, 55%, 0)`;
+            
+            let colorCenter, colorEdge;
+            if (isGrayscale) {
+              // Szaro-ciemne tło, gdy okładka jest czarno-biała
+              colorCenter = `hsla(0, 0%, 35%, 0.30)`;
+              colorEdge = `hsla(0, 0%, 35%, 0)`;
+            } else {
+              colorCenter = `hsla(${hue}, 85%, 55%, 0.45)`;
+              colorEdge = `hsla(${hue}, 85%, 55%, 0)`;
+            }
 
             const gradient = ctx.createRadialGradient(currentX, currentY, 0, currentX, currentY, blob.radius);
             gradient.addColorStop(0, colorCenter);
@@ -600,7 +609,7 @@
         setTimeout(triggerMultiFlash, 1500);
       }
 
-      function extractDominantHue(imgElement) {
+      function extractColorInfo(imgElement) {
         try {
           const c = document.createElement('canvas');
           const ctx = c.getContext('2d');
@@ -611,14 +620,12 @@
           const imgData = ctx.getImageData(0, 0, 40, 40).data;
           let r = 0, g = 0, b = 0, count = 0;
 
-          // Ulepszone uśrednianie barw - omijanie bardzo ciemnych i jasnych punktów
           for (let i = 0; i < imgData.length; i += 4) {
              const cr = imgData[i];
              const cg = imgData[i + 1];
              const cb = imgData[i + 2];
              
-             // Filtrujemy czerń i biel żeby złapać właściwy, nasycony kolor
-             if (cr > 30 && cg > 30 && cb > 30 && cr < 240 && cg < 240 && cb < 240) {
+             if (cr > 15 && cg > 15 && cb > 15 && cr < 240 && cg < 240 && cb < 240) {
                  r += cr;
                  g += cg;
                  b += cb;
@@ -626,27 +633,28 @@
              }
           }
           
-          if(count === 0) return 200; // fallback
+          if(count === 0) return { h: 200, s: 0, l: 20 };
 
           r = Math.round(r / count);
           g = Math.round(g / count);
           b = Math.round(b / count);
 
-          r /= 255; g /= 255; b /= 255;
-          const max = Math.max(r, g, b), min = Math.min(r, g, b);
-          let h = 0;
+          let rNorm = r / 255, gNorm = g / 255, bNorm = b / 255;
+          const max = Math.max(rNorm, gNorm, bNorm), min = Math.min(rNorm, gNorm, bNorm);
+          let h = 0, s = 0, l = (max + min) / 2;
 
           if (max !== min) {
             const d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
             switch (max) {
-              case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-              case g: h = (b - r) / d + 2; break;
-              case b: h = (r - g) / d + 4; break;
+              case rNorm: h = (gNorm - bNorm) / d + (gNorm < bNorm ? 6 : 0); break;
+              case gNorm: h = (bNorm - rNorm) / d + 2; break;
+              case bNorm: h = (rNorm - gNorm) / d + 4; break;
             }
             h /= 6;
           }
 
-          return Math.round(h * 360);
+          return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
         } catch (e) {
           return null;
         }
@@ -796,11 +804,18 @@
             cover.dataset.rawSrc = track.albumImageUrl;
             cover.src = track.albumImageUrl;
             cover.onload = () => {
-              const extractedHue = extractDominantHue(cover);
-              if (extractedHue !== null) {
-                targetHueOffset = extractedHue;
-                document.documentElement.style.setProperty('--dynamic-accent', `hsl(${extractedHue}, 65%, 50%)`);
-              };
+              const colorInfo = extractColorInfo(cover);
+              if (colorInfo !== null) {
+                targetHueOffset = colorInfo.h;
+                // Jeśli okładka jest czarno-biała / ma niską saturację (< 12%), włączamy szary motyw
+                if (colorInfo.s < 12) {
+                  isGrayscale = true;
+                  document.documentElement.style.setProperty('--dynamic-accent', '#94a3b8');
+                } else {
+                  isGrayscale = false;
+                  document.documentElement.style.setProperty('--dynamic-accent', `hsl(${colorInfo.h}, 65%, 50%)`);
+                }
+              }
             };
           }
 
