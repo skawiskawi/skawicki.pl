@@ -113,6 +113,8 @@ filter: drop-shadow(0 0 16px var(--dynamic-accent));
 transition: filter 0.8s ease, opacity 0.5s ease;
 animation: stagger-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 animation-delay: 0.05s;
+-webkit-mask-image: linear-gradient(to right, transparent 0%, black 18%, black 82%, transparent 100%);
+mask-image: linear-gradient(to right, transparent 0%, black 18%, black 82%, transparent 100%);
 }
 #soundwave-canvas {
 width: 100%;
@@ -352,11 +354,58 @@ width: 0%;
 background: linear-gradient(90deg, var(--dynamic-accent), var(--dynamic-accent-2));
 transition: width 0.4s linear;
 }
+
+.contact-wrapper {
+display: flex;
+align-items: center;
+justify-content: center;
+width: 100%;
+margin-top: 10px;
+animation: stagger-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+animation-delay: 0.48s;
+}
+.contact-icon-btn {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+width: 36px;
+height: 36px;
+border-radius: 50%;
+background: var(--card-bg);
+border: 1px solid var(--card-border);
+color: var(--text-muted);
+text-decoration: none;
+backdrop-filter: blur(20px);
+-webkit-backdrop-filter: blur(20px);
+box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+transition: transform 0.18s cubic-bezier(0.25, 1, 0.5, 1), background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+will-change: transform;
+transform-style: preserve-3d;
+}
+.contact-icon-btn svg {
+width: 18px;
+height: 18px;
+fill: currentColor;
+transition: transform 0.2s ease;
+}
+@media (hover: hover) {
+.contact-icon-btn:hover {
+background: var(--card-hover-bg);
+color: var(--text-main);
+border-color: var(--dynamic-accent);
+box-shadow: 0 0 16px var(--dynamic-accent);
+transform: scale(1.08) translateY(-2px);
+}
+}
+.contact-icon-btn:active {
+transform: scale(0.94) !important;
+}
+
 footer {
 text-align: center;
-margin-top: 20px;
+margin-top: 12px;
 animation: stagger-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
-animation-delay: 0.5s;
+animation-delay: 0.52s;
 }
 .footer-text {
 font-size: clamp(0.75rem, 2vw, 0.85rem);
@@ -437,6 +486,12 @@ GitHub
 <div id="spotify-progress" class="progress-bar"></div>
 </div>
 </a>
+
+<div class="contact-wrapper">
+<a href="https://t.me/pawulonrulon" target="_blank" rel="noopener noreferrer" class="contact-icon-btn tilt-card" title="Telegram" aria-label="Telegram" data-umami-event="click-telegram">
+<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.05-.2-.06-.05-.16-.03-.24-.02-.11.02-1.79 1.14-5.06 3.35-.48.33-.91.49-1.3.48-.43-.01-1.25-.24-1.86-.44-.75-.24-1.35-.37-1.3-.78.03-.21.32-.43.89-.66 3.5-1.52 5.83-2.53 7-3.01 3.33-1.39 4.02-1.63 4.48-1.64.1 0 .32.02.47.14.12.1.16.24.17.34 0 .07.01.21 0 .28z"/></svg>
+</a>
+</div>
 </div>
 <footer>
 <div class="footer-text">come stai</div>
@@ -624,7 +679,7 @@ if (waveCanvas) {
   let wavePhase1 = 0;
   let wavePhase2 = 0;
   let wavePhase3 = 0;
-  let currentAmp = 0; // 0 = flatline, 1 = full active wave
+  let currentAmp = 0;
   let ekgTime = 0;
 
   function getEkgSpike(norm) {
@@ -655,7 +710,7 @@ if (waveCanvas) {
 
     // Active Liquid Sine Waves
     if (currentAmp > 0.01) {
-      // Wave 3 (Ambient Harmonic Ribbon)
+      // Wave 3
       wCtx.save();
       wCtx.beginPath();
       for (let x = 0; x <= wWidth; x += 2) {
@@ -664,14 +719,20 @@ if (waveCanvas) {
         if (x === 0) wCtx.moveTo(x, y);
         else wCtx.lineTo(x, y);
       }
-      wCtx.strokeStyle = isGrayscale ? 'rgba(200, 200, 200, 0.25)' : `hsla(${currentHue1}, 90%, 75%, ${0.35 * currentAmp})`;
+      const grad3 = wCtx.createLinearGradient(0, 0, wWidth, 0);
+      grad3.addColorStop(0, 'rgba(0, 0, 0, 0)');
+      grad3.addColorStop(0.18, isGrayscale ? 'rgba(200, 200, 200, 0.25)' : `hsla(${currentHue1}, 90%, 75%, ${0.35 * currentAmp})`);
+      grad3.addColorStop(0.82, isGrayscale ? 'rgba(200, 200, 200, 0.25)' : `hsla(${currentHue1}, 90%, 75%, ${0.35 * currentAmp})`);
+      grad3.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+      wCtx.strokeStyle = grad3;
       wCtx.lineWidth = 1.6;
       wCtx.shadowColor = accent1;
       wCtx.shadowBlur = 8;
       wCtx.stroke();
       wCtx.restore();
 
-      // Wave 2 (Secondary Wave)
+      // Wave 2
       wCtx.save();
       wCtx.beginPath();
       for (let x = 0; x <= wWidth; x += 2) {
@@ -680,19 +741,27 @@ if (waveCanvas) {
         if (x === 0) wCtx.moveTo(x, y);
         else wCtx.lineTo(x, y);
       }
-      wCtx.strokeStyle = isGrayscale ? 'rgba(255, 255, 255, 0.4)' : `hsla(${currentHue2}, 85%, 65%, ${0.65 * currentAmp})`;
+      const grad2 = wCtx.createLinearGradient(0, 0, wWidth, 0);
+      grad2.addColorStop(0, 'rgba(0, 0, 0, 0)');
+      grad2.addColorStop(0.15, isGrayscale ? 'rgba(255, 255, 255, 0.4)' : `hsla(${currentHue2}, 85%, 65%, ${0.65 * currentAmp})`);
+      grad2.addColorStop(0.85, isGrayscale ? 'rgba(255, 255, 255, 0.4)' : `hsla(${currentHue2}, 85%, 65%, ${0.65 * currentAmp})`);
+      grad2.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+      wCtx.strokeStyle = grad2;
       wCtx.lineWidth = 2.2;
       wCtx.shadowColor = accent2;
       wCtx.shadowBlur = 12;
       wCtx.stroke();
       wCtx.restore();
 
-      // Wave 1 (Primary High-Glow Wave)
+      // Wave 1
       wCtx.save();
       const waveGrad = wCtx.createLinearGradient(0, 0, wWidth, 0);
-      waveGrad.addColorStop(0, accent1);
+      waveGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
+      waveGrad.addColorStop(0.15, accent1);
       waveGrad.addColorStop(0.5, '#ffffff');
-      waveGrad.addColorStop(1, accent2);
+      waveGrad.addColorStop(0.85, accent2);
+      waveGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
       wCtx.beginPath();
       for (let x = 0; x <= wWidth; x += 2) {
@@ -709,11 +778,11 @@ if (waveCanvas) {
       wCtx.restore();
     }
 
-    // Flatline & Cardiac Heartbeat Monitor (EKG)
+    // Flatline & EKG Monitor
     if (currentAmp < 0.99) {
       const flatlineWeight = 1 - currentAmp;
-      const cycle = ekgTime % 3.6; // 3.6s cycle
-      const pulseDuration = 1.1; // sweep duration
+      const cycle = ekgTime % 3.6;
+      const pulseDuration = 1.1;
       let pulseX = -100;
       let isPulsing = false;
 
@@ -743,7 +812,6 @@ if (waveCanvas) {
             }
           }
         }
-        // Microscopic hospital baseline tremor
         const tremor = Math.sin(ekgTime * 10 + x * 0.08) * 0.4 * flatlineWeight;
         const y = centerY - ekgOffset + tremor;
 
@@ -752,9 +820,11 @@ if (waveCanvas) {
       }
 
       const flatGrad = wCtx.createLinearGradient(0, 0, wWidth, 0);
-      flatGrad.addColorStop(0, `hsla(${currentHue1}, 70%, 55%, ${0.25 * flatlineWeight})`);
-      flatGrad.addColorStop(0.5, `hsla(0, 0%, 100%, ${0.85 * flatlineWeight})`);
-      flatGrad.addColorStop(1, `hsla(${currentHue2}, 70%, 55%, ${0.25 * flatlineWeight})`);
+      flatGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
+      flatGrad.addColorStop(0.18, `hsla(${currentHue1}, 70%, 55%, ${0.35 * flatlineWeight})`);
+      flatGrad.addColorStop(0.5, `hsla(0, 0%, 100%, ${0.9 * flatlineWeight})`);
+      flatGrad.addColorStop(0.82, `hsla(${currentHue2}, 70%, 55%, ${0.35 * flatlineWeight})`);
+      flatGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
       wCtx.strokeStyle = flatGrad;
       wCtx.lineWidth = 1.8;
@@ -762,7 +832,6 @@ if (waveCanvas) {
       wCtx.shadowBlur = 10;
       wCtx.stroke();
 
-      // Glowing cardiac light bead on the pulse tip
       if (activePeakX > 0 && activePeakX < wWidth) {
         wCtx.beginPath();
         wCtx.arc(activePeakX, activePeakY, 2.5, 0, Math.PI * 2);
