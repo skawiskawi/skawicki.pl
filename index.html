@@ -86,9 +86,9 @@ display: flex;
 flex-direction: column;
 justify-content: space-between;
 align-items: center;
-padding: clamp(14px, 2.5vh, 28px) 20px;
-padding-top: max(clamp(14px, 2.5vh, 28px), env(safe-area-inset-top));
-padding-bottom: max(clamp(14px, 2.5vh, 28px), env(safe-area-inset-bottom));
+padding: clamp(12px, 2vh, 24px) 20px;
+padding-top: max(clamp(12px, 2vh, 24px), env(safe-area-inset-top));
+padding-bottom: max(clamp(12px, 2vh, 24px), env(safe-area-inset-bottom));
 perspective: 1000px;
 }
 .header-spacer {
@@ -100,7 +100,7 @@ max-width: 310px;
 display: flex;
 flex-direction: column;
 align-items: center;
-gap: clamp(12px, 2vh, 18px);
+gap: clamp(10px, 1.8vh, 16px);
 margin: auto 0;
 }
 .sound-wave {
@@ -108,7 +108,7 @@ display: flex;
 align-items: center;
 justify-content: center;
 gap: 6px;
-height: 26px;
+height: 24px;
 opacity: 0.95;
 user-select: none;
 filter: drop-shadow(0 0 14px var(--dynamic-accent));
@@ -165,7 +165,7 @@ border-radius: 2px;
 width: 100%;
 display: flex;
 flex-direction: column;
-gap: 8px;
+gap: 7px;
 }
 .link-btn {
 position: relative;
@@ -174,7 +174,7 @@ align-items: center;
 justify-content: center;
 gap: 10px;
 width: 100%;
-min-height: 40px;
+min-height: 39px;
 padding: 8px 16px;
 background: var(--card-bg);
 border: 1px solid var(--card-border);
@@ -233,7 +233,7 @@ display: flex;
 align-items: center;
 justify-content: center;
 width: 100%;
-margin: 4px 0 1px 0;
+margin: 3px 0 1px 0;
 gap: 12px;
 animation: stagger-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
@@ -252,8 +252,8 @@ color: rgba(255, 255, 255, 0.3);
 }
 .spotify-widget {
 width: 100%;
-margin-top: 4px;
-padding: 9px 13px 11px 13px;
+margin-top: 2px;
+padding: 8px 12px 10px 12px;
 background: rgba(255, 255, 255, 0.025);
 border: 1px solid rgba(255, 255, 255, 0.07);
 border-radius: 16px;
@@ -309,8 +309,8 @@ width: 100%;
 }
 .album-cover-wrapper {
 position: relative;
-width: 40px;
-height: 40px;
+width: 38px;
+height: 38px;
 flex-shrink: 0;
 border-radius: 8px;
 overflow: hidden;
@@ -434,14 +434,62 @@ width: 0%;
 background: linear-gradient(90deg, var(--dynamic-accent), var(--dynamic-accent-2));
 transition: width 0.4s linear;
 }
+
+/* Telegram Contact Button */
+.contact-wrapper {
+display: flex;
+align-items: center;
+justify-content: center;
+width: 100%;
+margin-top: 2px;
+animation: stagger-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+animation-delay: 0.48s;
+}
+.contact-icon-btn {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+width: 34px;
+height: 34px;
+border-radius: 50%;
+background: var(--card-bg);
+border: 1px solid var(--card-border);
+color: var(--text-muted);
+text-decoration: none;
+backdrop-filter: blur(20px);
+-webkit-backdrop-filter: blur(20px);
+box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+transition: transform 0.18s cubic-bezier(0.25, 1, 0.5, 1), background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+will-change: transform;
+transform-style: preserve-3d;
+}
+.contact-icon-btn svg {
+width: 15px;
+height: 15px;
+fill: currentColor;
+transition: transform 0.2s ease;
+}
+@media (hover: hover) {
+.contact-icon-btn:hover {
+background: var(--card-hover-bg);
+color: var(--text-main);
+border-color: var(--dynamic-accent);
+box-shadow: 0 0 16px var(--dynamic-accent);
+transform: scale(1.08) translateY(-2px);
+}
+}
+.contact-icon-btn:active {
+transform: scale(0.94) !important;
+}
+
 footer {
 text-align: center;
-margin-top: 10px;
+margin-top: 4px;
 animation: stagger-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
-animation-delay: 0.5s;
+animation-delay: 0.52s;
 }
 .footer-text {
-font-size: clamp(0.72rem, 1.8vw, 0.80rem);
+font-size: clamp(0.70rem, 1.8vw, 0.78rem);
 font-weight: 500;
 letter-spacing: 6px;
 background: linear-gradient(135deg, #94a3b8, #cbd5e1);
@@ -476,34 +524,34 @@ padding-left: 6px;
 <div class="bar"></div>
 </div>
 <main class="links-wrapper">
-<a href="https://open.spotify.com/user/313sruf6nyv7gp4wo5bnyon5wqf4" target="_blank" rel="noopener noreferrer" class="link-btn spotify tilt-card">
+<a href="https://open.spotify.com/user/313sruf6nyv7gp4wo5bnyon5wqf4" target="_blank" rel="noopener noreferrer" class="link-btn spotify tilt-card" data-umami-event="click-spotify">
 <svg viewBox="0 0 24 24"><path d="M12 0C5.376 0 0 5.376 0 12s5.376 12 12 12 12-5.376 12-12S18.624 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.899 4.62-1.02 8.58-.6 11.7 1.32.42.18.48.66.24 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141 C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.18-1.38-.72-.18-.6.18-1.2.72-1.38 4.26-1.26 11.28-1.02 15.72 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
 Spotify
 </a>
-<a href="https://genius.com/skawi" target="_blank" rel="noopener noreferrer" class="link-btn genius tilt-card">
+<a href="https://genius.com/skawi" target="_blank" rel="noopener noreferrer" class="link-btn genius tilt-card" data-umami-event="click-genius">
 <svg viewBox="0 0 24 24"><path d="M24 0H0v24h24V0zM4.8 19.2V4.8h4.8v14.4H4.8zm9.6 0h-3.6V4.8h3.6v14.4zm4.8 0h-3.6V4.8h3.6v14.4z"/></svg>
 Genius
 </a>
-<a href="https://stats.fm/skawi" target="_blank" rel="noopener noreferrer" class="link-btn statsfm tilt-card">
+<a href="https://stats.fm/skawi" target="_blank" rel="noopener noreferrer" class="link-btn statsfm tilt-card" data-umami-event="click-statsfm">
 <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
 Stats.fm
 </a>
 <div class="section-divider">
 <span>gaming</span>
 </div>
-<a href="https://fortnitetracker.com/profile/all/skawi" target="_blank" rel="noopener noreferrer" class="link-btn fortnite tilt-card">
+<a href="https://fortnitetracker.com/profile/all/skawi" target="_blank" rel="noopener noreferrer" class="link-btn fortnite tilt-card" data-umami-event="click-fortnite">
 <svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H9v2H7v-2H5v-2h2V9h2v2h2v2zm4.5 1c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3-3c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
 Fortnite Tracker
 </a>
 <div class="section-divider">
 <span>code</span>
 </div>
-<a href="https://github.com/skawiskawi" target="_blank" rel="noopener noreferrer" class="link-btn github tilt-card">
+<a href="https://github.com/skawiskawi" target="_blank" rel="noopener noreferrer" class="link-btn github tilt-card" data-umami-event="click-github">
 <svg viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
 GitHub
 </a>
 </main>
-<a id="spotify-card" href="#" target="_blank" class="spotify-widget tilt-card">
+<a id="spotify-card" href="#" target="_blank" class="spotify-widget tilt-card" data-umami-event="click-spotify-widget">
 <div class="spotify-widget-content">
 <div class="album-cover-wrapper" id="spotify-cover-wrap">
 <img id="spotify-cover" class="album-cover" src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2364748b'><path d='M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z'/></svg>" alt="Album Cover">
@@ -525,6 +573,12 @@ GitHub
 <div id="spotify-progress" class="progress-bar"></div>
 </div>
 </a>
+
+<div class="contact-wrapper">
+<a href="https://t.me/pawulonrulon" target="_blank" rel="noopener noreferrer" class="contact-icon-btn tilt-card" title="Napisz na Telegramie" aria-label="Telegram" data-umami-event="click-telegram">
+<svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
+</a>
+</div>
 </div>
 <footer>
 <div class="footer-text">come stai</div>
