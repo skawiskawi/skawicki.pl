@@ -101,7 +101,7 @@ transition: filter 0.8s ease;
 .bar {
 width: 3.5px;
 height: 100%;
-background: linear-gradient(180deg, rgba(255,255,255,0.8), var(--dynamic-accent), rgba(255,255,255,0.2));
+background: linear-gradient(180deg, rgba(255,255,255,0.8), var(--dynamic-accent), var(--dynamic-accent-2));
 border-radius: 99px;
 animation: pulse-fast 0.6s ease-in-out infinite alternate;
 will-change: transform;
@@ -215,7 +215,7 @@ top: -50%;
 left: -50%;
 width: 200%;
 height: 200%;
-background: conic-gradient(transparent, transparent, transparent, var(--dynamic-accent));
+background: conic-gradient(transparent, var(--dynamic-accent), transparent, var(--dynamic-accent-2));
 animation: border-beam 4s linear infinite;
 z-index: 0;
 opacity: 0.4;
@@ -250,7 +250,8 @@ flex-shrink: 0;
 border-radius: 8px;
 overflow: hidden;
 background: rgba(255, 255, 255, 0.05);
-box-shadow: 0 0 14px rgba(0, 0, 0, 0.4);
+box-shadow: 0 0 16px var(--dynamic-accent);
+transition: box-shadow 0.8s ease;
 }
 .album-cover {
 width: 100%;
@@ -325,8 +326,8 @@ z-index: 2;
 .progress-bar {
 height: 100%;
 width: 0%;
-background: var(--dynamic-accent);
-transition: width 0.4s linear, background-color 0.8s ease;
+background: linear-gradient(90deg, var(--dynamic-accent), var(--dynamic-accent-2));
+transition: width 0.4s linear;
 }
 footer {
 text-align: center;
@@ -766,6 +767,7 @@ extractPaletteFromUrl(track.albumImageUrl).then(colors => {
   if (colors.isGrayscale) {
     isGrayscale = true;
     document.documentElement.style.setProperty('--dynamic-accent', '#94a3b8');
+    document.documentElement.style.setProperty('--dynamic-accent-2', '#cbd5e1');
   } else {
     isGrayscale = false;
     targetHue1 = colors.c1;
