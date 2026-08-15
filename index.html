@@ -251,7 +251,7 @@ color: rgba(255, 255, 255, 0.3);
 .spotify-widget {
 width: 100%;
 margin-top: 4px;
-padding: 10px 14px 12px 14px;
+padding: 10px 12px 12px 12px;
 background: rgba(255, 255, 255, 0.025);
 border: 1px solid rgba(255, 255, 255, 0.07);
 border-radius: 16px;
@@ -259,7 +259,6 @@ backdrop-filter: blur(28px) saturate(150%);
 -webkit-backdrop-filter: blur(28px) saturate(150%);
 display: flex;
 align-items: center;
-gap: 12px;
 text-decoration: none;
 color: inherit;
 transition: transform 0.18s cubic-bezier(0.25, 1, 0.5, 1), background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
@@ -302,7 +301,7 @@ position: relative;
 z-index: 1;
 display: flex;
 align-items: center;
-gap: 12px;
+gap: 10px;
 width: 100%;
 }
 .album-cover-wrapper {
@@ -313,8 +312,6 @@ flex-shrink: 0;
 border-radius: 10px;
 overflow: hidden;
 background: rgba(255, 255, 255, 0.05);
-box-shadow: 0 0 16px var(--dynamic-accent);
-transition: box-shadow 0.8s ease, transform 0.2s ease;
 cursor: pointer;
 }
 .album-cover {
@@ -322,37 +319,29 @@ width: 100%;
 height: 100%;
 object-fit: cover;
 border-radius: 10px;
-transition: filter 0.3s ease, transform 0.3s ease;
+transition: transform 0.3s ease;
 }
 .preview-overlay {
 position: absolute;
 inset: 0;
-background: rgba(0, 0, 0, 0.55);
-backdrop-filter: blur(2px);
--webkit-backdrop-filter: blur(2px);
+background: rgba(0, 0, 0, 0.45);
+backdrop-filter: blur(1.5px);
+-webkit-backdrop-filter: blur(1.5px);
 display: flex;
 align-items: center;
 justify-content: center;
 opacity: 0;
-transition: opacity 0.25s ease;
+transition: opacity 0.2s ease;
 border-radius: 10px;
 }
 .preview-overlay svg {
-width: 18px;
-height: 18px;
+width: 16px;
+height: 16px;
 fill: #ffffff;
-filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
-transition: transform 0.2s ease;
 }
 .album-cover-wrapper:hover .preview-overlay,
-.album-cover-wrapper.is-playing-preview .preview-overlay {
+.album-cover-wrapper.is-playing .preview-overlay {
 opacity: 1;
-}
-.album-cover-wrapper:hover .album-cover {
-transform: scale(1.05);
-}
-.album-cover-wrapper.is-playing-preview {
-box-shadow: 0 0 22px var(--dynamic-accent), 0 0 8px #ffffff;
 }
 .track-info {
 display: flex;
@@ -408,6 +397,46 @@ white-space: nowrap;
 overflow: hidden;
 text-overflow: ellipsis;
 margin-top: 1px;
+}
+.play-btn-action {
+width: 32px;
+height: 32px;
+border-radius: 50%;
+background: rgba(255, 255, 255, 0.08);
+border: 1px solid rgba(255, 255, 255, 0.15);
+display: none;
+align-items: center;
+justify-content: center;
+flex-shrink: 0;
+color: var(--text-main);
+cursor: pointer;
+transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+backdrop-filter: blur(10px);
+}
+.play-btn-action:hover {
+background: var(--dynamic-accent);
+color: #050608;
+transform: scale(1.08);
+border-color: transparent;
+box-shadow: 0 0 14px var(--dynamic-accent);
+}
+.play-btn-action:active {
+transform: scale(0.92);
+}
+.play-btn-action svg {
+width: 14px;
+height: 14px;
+fill: currentColor;
+margin-left: 2px;
+transition: transform 0.15s ease;
+}
+.play-btn-action.playing svg {
+margin-left: 0;
+}
+.play-btn-action.playing {
+background: var(--dynamic-accent);
+color: #050608;
+box-shadow: 0 0 12px var(--dynamic-accent);
 }
 .progress-bar-container {
 position: absolute;
@@ -498,8 +527,8 @@ GitHub
 <div class="album-cover-wrapper" id="album-cover-trigger" title="Odtwórz / Zatrzymaj podgląd">
 <img id="spotify-cover" class="album-cover" src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2364748b'><path d='M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z'/></svg>" alt="Album Cover">
 <div class="preview-overlay" id="preview-overlay">
-<svg id="preview-play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-<svg id="preview-pause-icon" viewBox="0 0 24 24" style="display: none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+<svg id="cover-play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+<svg id="cover-pause-icon" viewBox="0 0 24 24" style="display: none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
 </div>
 </div>
 <div class="track-info">
@@ -514,6 +543,10 @@ GitHub
 <div id="spotify-title" class="track-title">Sprawdzanie...</div>
 <div id="spotify-artist" class="track-artist">Ładowanie odtwarzacza</div>
 </div>
+<button class="play-btn-action" id="action-play-btn" aria-label="Play Preview">
+<svg id="action-play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+<svg id="action-pause-icon" viewBox="0 0 24 24" style="display: none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+</button>
 </div>
 <div class="progress-bar-container">
 <div id="spotify-progress" class="progress-bar"></div>
@@ -779,50 +812,63 @@ tiltCards.forEach(card => {
 });
 
 const albumCoverTrigger = document.getElementById('album-cover-trigger');
-const playIcon = document.getElementById('preview-play-icon');
-const pauseIcon = document.getElementById('preview-pause-icon');
+const actionPlayBtn = document.getElementById('action-play-btn');
+const coverPlayIcon = document.getElementById('cover-play-icon');
+const coverPauseIcon = document.getElementById('cover-pause-icon');
+const actionPlayIcon = document.getElementById('action-play-icon');
+const actionPauseIcon = document.getElementById('action-pause-icon');
 
 function setPreviewPlaybackState(playing) {
   isPreviewPlaying = playing;
   if (albumCoverTrigger) {
     if (playing) {
-      albumCoverTrigger.classList.add('is-playing-preview');
-      playIcon.style.display = 'none';
-      pauseIcon.style.display = 'block';
+      albumCoverTrigger.classList.add('is-playing');
+      coverPlayIcon.style.display = 'none';
+      coverPauseIcon.style.display = 'block';
     } else {
-      albumCoverTrigger.classList.remove('is-playing-preview');
-      playIcon.style.display = 'block';
-      pauseIcon.style.display = 'none';
+      albumCoverTrigger.classList.remove('is-playing');
+      coverPlayIcon.style.display = 'block';
+      coverPauseIcon.style.display = 'none';
+    }
+  }
+  if (actionPlayBtn) {
+    if (playing) {
+      actionPlayBtn.classList.add('playing');
+      actionPlayIcon.style.display = 'none';
+      actionPauseIcon.style.display = 'block';
+    } else {
+      actionPlayBtn.classList.remove('playing');
+      actionPlayIcon.style.display = 'block';
+      actionPauseIcon.style.display = 'none';
     }
   }
 }
 
-if (albumCoverTrigger) {
-  albumCoverTrigger.addEventListener('click', (e) => {
+function togglePreview(e) {
+  if (e) {
     e.preventDefault();
     e.stopPropagation();
+  }
+  if (!currentPreviewUrl) return;
 
-    if (!currentPreviewUrl) return;
-
-    if (isPreviewPlaying) {
-      previewAudio.pause();
-      setPreviewPlaybackState(false);
-    } else {
-      if (previewAudio.src !== currentPreviewUrl) {
-        previewAudio.src = currentPreviewUrl;
-      }
-      previewAudio.play().then(() => {
-        setPreviewPlaybackState(true);
-      }).catch(() => {
-        setPreviewPlaybackState(false);
-      });
-    }
-  });
-
-  previewAudio.addEventListener('ended', () => {
+  if (isPreviewPlaying) {
+    previewAudio.pause();
     setPreviewPlaybackState(false);
-  });
+  } else {
+    if (previewAudio.src !== currentPreviewUrl) {
+      previewAudio.src = currentPreviewUrl;
+    }
+    previewAudio.play().then(() => {
+      setPreviewPlaybackState(true);
+    }).catch(() => {
+      setPreviewPlaybackState(false);
+    });
+  }
 }
+
+if (albumCoverTrigger) albumCoverTrigger.addEventListener('click', togglePreview);
+if (actionPlayBtn) actionPlayBtn.addEventListener('click', togglePreview);
+previewAudio.addEventListener('ended', () => setPreviewPlaybackState(false));
 
 const SPOTIFY_CONFIG = {
 CLIENT_ID: '2d54be40e04943efa086ed8358ab169c',
@@ -947,6 +993,7 @@ const eqIcon = document.getElementById('eq-icon');
 const progressBar = document.getElementById('spotify-progress');
 const mainSoundWave = document.getElementById('main-sound-wave');
 const previewOverlay = document.getElementById('preview-overlay');
+const actionBtn = document.getElementById('action-play-btn');
 
 if (!card || !cover || !title || !artist || !statusText || !eqIcon || !progressBar) return;
 
@@ -954,6 +1001,9 @@ if (track.title) {
 currentPreviewUrl = track.previewUrl || null;
 if (previewOverlay) {
   previewOverlay.style.display = currentPreviewUrl ? 'flex' : 'none';
+}
+if (actionBtn) {
+  actionBtn.style.display = currentPreviewUrl ? 'flex' : 'none';
 }
 
 if (track.id && track.id !== lastTrackId) {
@@ -1020,6 +1070,7 @@ progressBar.style.width = '0%';
 currentBpm = 120;
 currentPreviewUrl = null;
 if (previewOverlay) previewOverlay.style.display = 'none';
+if (actionBtn) actionBtn.style.display = 'none';
 if (previewAudio && !previewAudio.paused) {
   previewAudio.pause();
   setPreviewPlaybackState(false);
