@@ -112,12 +112,15 @@ user-select: none;
 transition: opacity 0.5s ease;
 animation: stagger-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 animation-delay: 0.05s;
-/* Czysty kod - usunięto wszystkie filtry, maski i shadow, robimy to tylko na canvasie */
+-webkit-mask-image: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 20%, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%);
+mask-image: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 20%, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%);
 }
 #soundwave-canvas {
 width: 100%;
 height: 100%;
 display: block;
+filter: drop-shadow(0 0 16px var(--dynamic-accent));
+transition: filter 0.8s ease;
 }
 .links-wrapper {
 width: 100%;
@@ -674,7 +677,7 @@ if (waveCanvas) {
   let wavePhase1 = 0;
   let wavePhase2 = 0;
   let wavePhase3 = 0;
-  let currentAmp = 0; // 0 = flatline, 1 = full active wave
+  let currentAmp = 0; 
   let ekgTime = 0;
 
   function getEkgSpike(norm) {
@@ -698,31 +701,22 @@ if (waveCanvas) {
     ekgTime += 0.016;
 
     wCtx.clearRect(0, 0, wWidth, wHeight);
-    
-    // PRZEBUDOWA: Matematyczny padding chroniący przed ucięciem shadowBlur na brzegach canvasu.
     const centerY = wHeight / 2;
-    const pad = 36; // Margines bezpieczeństwa z obu stron (36px).
-    const drawW = wWidth - pad * 2; // Rzeczywisty obszar rysowania matematycznej fali
 
     const accent1 = isGrayscale ? 'hsl(0, 0%, 70%)' : `hsl(${currentHue1}, 85%, 60%)`;
     const accent2 = isGrayscale ? 'hsl(0, 0%, 55%)' : `hsl(${currentHue2}, 85%, 60%)`;
 
-    wCtx.lineCap = 'round'; // Zaokrąglenie końcówek linii na marginesach
-
     // Active Liquid Sine Waves
     if (currentAmp > 0.01) {
-      // Wave 3 (Ambient Harmonic Ribbon)
       wCtx.save();
       wCtx.beginPath();
-      for (let x = 0; x <= drawW; x += 2) {
-        // Obwiednia matematycznie spłaszcza Y do zera dużo przed dotknięciem marginesu
-        const envelope = Math.sin((x / drawW) * Math.PI) ** 1.8;
-        const realX = pad + x;
+      for (let x = 0; x <= wWidth; x += 2) {
+        const envelope = Math.sin((x / wWidth) * Math.PI) ** 1.3;
         const y = centerY - (Math.sin(x * 0.032 + wavePhase3) * 8 + Math.cos(x * 0.015 - wavePhase3 * 0.7) * 5) * envelope * currentAmp;
-        if (x === 0) wCtx.moveTo(realX, y);
-        else wCtx.lineTo(realX, y);
+        if (x === 0) wCtx.moveTo(x, y);
+        else wCtx.lineTo(x, y);
       }
-      const grad3 = wCtx.createLinearGradient(pad, 0, wWidth - pad, 0);
+      const grad3 = wCtx.createLinearGradient(0, 0, wWidth, 0);
       grad3.addColorStop(0, 'rgba(0, 0, 0, 0)');
       grad3.addColorStop(0.18, isGrayscale ? 'rgba(200, 200, 200, 0.25)' : `hsla(${currentHue1}, 90%, 75%, ${0.35 * currentAmp})`);
       grad3.addColorStop(0.82, isGrayscale ? 'rgba(200, 200, 200, 0.25)' : `hsla(${currentHue1}, 90%, 75%, ${0.35 * currentAmp})`);
@@ -735,17 +729,15 @@ if (waveCanvas) {
       wCtx.stroke();
       wCtx.restore();
 
-      // Wave 2 (Secondary Wave)
       wCtx.save();
       wCtx.beginPath();
-      for (let x = 0; x <= drawW; x += 2) {
-        const envelope = Math.sin((x / drawW) * Math.PI) ** 1.6;
-        const realX = pad + x;
+      for (let x = 0; x <= wWidth; x += 2) {
+        const envelope = Math.sin((x / wWidth) * Math.PI) ** 1.2;
         const y = centerY - (Math.sin(x * 0.020 - wavePhase2 + 1.2) * 12 + Math.cos(x * 0.035 + wavePhase2 * 0.6) * 6) * envelope * currentAmp;
-        if (x === 0) wCtx.moveTo(realX, y);
-        else wCtx.lineTo(realX, y);
+        if (x === 0) wCtx.moveTo(x, y);
+        else wCtx.lineTo(x, y);
       }
-      const grad2 = wCtx.createLinearGradient(pad, 0, wWidth - pad, 0);
+      const grad2 = wCtx.createLinearGradient(0, 0, wWidth, 0);
       grad2.addColorStop(0, 'rgba(0, 0, 0, 0)');
       grad2.addColorStop(0.15, isGrayscale ? 'rgba(255, 255, 255, 0.4)' : `hsla(${currentHue2}, 85%, 65%, ${0.65 * currentAmp})`);
       grad2.addColorStop(0.85, isGrayscale ? 'rgba(255, 255, 255, 0.4)' : `hsla(${currentHue2}, 85%, 65%, ${0.65 * currentAmp})`);
@@ -758,9 +750,8 @@ if (waveCanvas) {
       wCtx.stroke();
       wCtx.restore();
 
-      // Wave 1 (Primary High-Glow Wave)
       wCtx.save();
-      const waveGrad = wCtx.createLinearGradient(pad, 0, wWidth - pad, 0);
+      const waveGrad = wCtx.createLinearGradient(0, 0, wWidth, 0);
       waveGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
       waveGrad.addColorStop(0.15, accent1);
       waveGrad.addColorStop(0.5, '#ffffff');
@@ -768,12 +759,11 @@ if (waveCanvas) {
       waveGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
       wCtx.beginPath();
-      for (let x = 0; x <= drawW; x += 2) {
-        const envelope = Math.sin((x / drawW) * Math.PI) ** 1.4;
-        const realX = pad + x;
+      for (let x = 0; x <= wWidth; x += 2) {
+        const envelope = Math.sin((x / wWidth) * Math.PI) ** 1.1;
         const y = centerY - (Math.sin(x * 0.024 + wavePhase1) * Math.cos(x * 0.012 + wavePhase1 * 0.6) * 16 + Math.sin(x * 0.048 - wavePhase1 * 1.1) * 4) * envelope * currentAmp;
-        if (x === 0) wCtx.moveTo(realX, y);
-        else wCtx.lineTo(realX, y);
+        if (x === 0) wCtx.moveTo(x, y);
+        else wCtx.lineTo(x, y);
       }
       wCtx.strokeStyle = waveGrad;
       wCtx.lineWidth = 2.8;
@@ -794,7 +784,7 @@ if (waveCanvas) {
       if (cycle < pulseDuration) {
         isPulsing = true;
         const progress = cycle / pulseDuration;
-        pulseX = progress * (drawW + 80) - 40;
+        pulseX = progress * (wWidth + 80) - 40;
       }
 
       wCtx.save();
@@ -803,8 +793,7 @@ if (waveCanvas) {
       let activePeakX = -1;
       let activePeakY = centerY;
 
-      for (let x = 0; x <= drawW; x += 2) {
-        const realX = pad + x;
+      for (let x = 0; x <= wWidth; x += 2) {
         let ekgOffset = 0;
         if (isPulsing) {
           const dx = x - pulseX;
@@ -813,7 +802,7 @@ if (waveCanvas) {
             const norm = dx / windowHalf;
             ekgOffset = getEkgSpike(norm) * flatlineWeight;
             if (ekgOffset > 10) {
-              activePeakX = realX;
+              activePeakX = x;
               activePeakY = centerY - ekgOffset;
             }
           }
@@ -821,11 +810,11 @@ if (waveCanvas) {
         const tremor = Math.sin(ekgTime * 10 + x * 0.08) * 0.4 * flatlineWeight;
         const y = centerY - ekgOffset + tremor;
 
-        if (x === 0) wCtx.moveTo(realX, y);
-        else wCtx.lineTo(realX, y);
+        if (x === 0) wCtx.moveTo(x, y);
+        else wCtx.lineTo(x, y);
       }
 
-      const flatGrad = wCtx.createLinearGradient(pad, 0, wWidth - pad, 0);
+      const flatGrad = wCtx.createLinearGradient(0, 0, wWidth, 0);
       flatGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
       flatGrad.addColorStop(0.18, `hsla(${currentHue1}, 70%, 55%, ${0.25 * flatlineWeight})`);
       flatGrad.addColorStop(0.5, `hsla(0, 0%, 100%, ${0.85 * flatlineWeight})`);
@@ -838,8 +827,7 @@ if (waveCanvas) {
       wCtx.shadowBlur = 10;
       wCtx.stroke();
 
-      // Glowing cardiac light bead on the pulse tip
-      if (activePeakX > pad && activePeakX < wWidth - pad) {
+      if (activePeakX > 0 && activePeakX < wWidth) {
         wCtx.beginPath();
         wCtx.arc(activePeakX, activePeakY, 2.5, 0, Math.PI * 2);
         wCtx.fillStyle = '#ffffff';
@@ -963,192 +951,88 @@ tiltCards.forEach(card => {
 });
 
 /* ==========================================================================
-   SPOTIFY API INTEGRATION
+   SPOTIFY API INTEGRATION (SECURE ENDPOINT CLOUDFLARE)
    ========================================================================== */
-const SPOTIFY_CONFIG = {
-CLIENT_ID: '2d54be40e04943efa086ed8358ab169c',
-CLIENT_SECRET: '09ee688d79a24eb9a1148d573a814bac',
-REFRESH_TOKEN: 'AQDM9YXagkIir6H-QPfVa5MIcNJHqCNTi3GOnvOQ91QEEQg2CDCVuMicMqxHyOgxWqa746kwtHy7PLdhdWGPWiw3w29n0qkB7y1yahCX3ldFd8EMyQvnfYkWNJOk423Ydhc'
-};
-const TOKEN_ENDPOINT = `https://accounts.spotify.com/api/token`;
-const NOW_PLAYING_ENDPOINT = `https://api.spotify.com/v1/me/player/currently-playing`;
-const RECENTLY_PLAYED_ENDPOINT = `https://api.spotify.com/v1/me/player/recently-played?limit=1`;
-const AUDIO_FEATURES_ENDPOINT = `https://api.spotify.com/v1/audio-features/`;
-
-let cachedAccessToken = null;
-async function getAccessToken() {
-if (cachedAccessToken) return cachedAccessToken;
-try {
-const basic = btoa(`${SPOTIFY_CONFIG.CLIENT_ID}:${SPOTIFY_CONFIG.CLIENT_SECRET}`);
-const response = await fetch(TOKEN_ENDPOINT, {
-method: 'POST',
-headers: {
-'Authorization': `Basic ${basic}`,
-'Content-Type': 'application/x-www-form-urlencoded'
-},
-body: new URLSearchParams({
-grant_type: 'refresh_token',
-refresh_token: SPOTIFY_CONFIG.REFRESH_TOKEN
-})
-});
-if (!response.ok) return null;
-const data = await response.json();
-cachedAccessToken = data.access_token;
-setTimeout(() => {
-cachedAccessToken = null;
-}, 3500000);
-return cachedAccessToken;
-} catch (err) {
-return null;
-}
-}
-async function fetchSpotifyApi(endpoint) {
-let token = await getAccessToken();
-if (!token) return null;
-let res = await fetch(endpoint, {
-headers: { Authorization: `Bearer ${token}` }
-});
-if (res.status === 401) {
-cachedAccessToken = null;
-token = await getAccessToken();
-if (!token) return null;
-res = await fetch(endpoint, {
-headers: { Authorization: `Bearer ${token}` }
-});
-}
-return res;
-}
-
-async function fetchAudioFeatures(trackId) {
-  if (!trackId) return null;
+async function getSpotifyStatus() {
   try {
-    const res = await fetchSpotifyApi(`${AUDIO_FEATURES_ENDPOINT}${trackId}`);
-    if (res && res.status === 200) {
+    const res = await fetch('/api/spotify');
+    if (res.ok) {
       return await res.json();
     }
-  } catch (e) {
-    return null;
+    return { isPlaying: false, isRecentlyPlayed: false };
+  } catch (err) {
+    return { isPlaying: false, isRecentlyPlayed: false };
   }
-  return null;
-}
-
-async function getSpotifyStatus() {
-try {
-const nowPlayingRes = await fetchSpotifyApi(NOW_PLAYING_ENDPOINT);
-if (nowPlayingRes && nowPlayingRes.status === 200) {
-const data = await nowPlayingRes.json();
-if (data && data.item) {
-return {
-id: data.item.id,
-isPlaying: data.is_playing,
-isRecentlyPlayed: false,
-title: data.item.name,
-artist: data.item.artists.map(a => a.name).join(', '),
-albumImageUrl: data.item.album.images[0]?.url,
-songUrl: data.item.external_urls.spotify,
-progressMs: data.progress_ms,
-durationMs: data.item.duration_ms
-};
-}
-}
-const recentlyRes = await fetchSpotifyApi(RECENTLY_PLAYED_ENDPOINT);
-if (recentlyRes && recentlyRes.status === 200) {
-const recentData = await recentlyRes.json();
-const lastTrack = recentData.items[0]?.track;
-if (lastTrack) {
-return {
-id: lastTrack.id,
-isPlaying: false,
-isRecentlyPlayed: true,
-title: lastTrack.name,
-artist: lastTrack.artists.map(a => a.name).join(', '),
-albumImageUrl: lastTrack.album.images[0]?.url,
-songUrl: lastTrack.external_urls.spotify,
-progressMs: 0,
-durationMs: 0
-};
-}
-}
-return { isPlaying: false, isRecentlyPlayed: false };
-} catch (err) {
-return { isPlaying: false, isRecentlyPlayed: false };
-}
 }
 
 async function updateSpotifyCard() {
-const track = await getSpotifyStatus();
-const card = document.getElementById('spotify-card');
-const cover = document.getElementById('spotify-cover');
-const title = document.getElementById('spotify-title');
-const artist = document.getElementById('spotify-artist');
-const statusText = document.getElementById('spotify-status-text');
-const eqIcon = document.getElementById('eq-icon');
-const progressBar = document.getElementById('spotify-progress');
+  const track = await getSpotifyStatus();
+  const card = document.getElementById('spotify-card');
+  const cover = document.getElementById('spotify-cover');
+  const title = document.getElementById('spotify-title');
+  const artist = document.getElementById('spotify-artist');
+  const statusText = document.getElementById('spotify-status-text');
+  const eqIcon = document.getElementById('eq-icon');
+  const progressBar = document.getElementById('spotify-progress');
 
-if (!card || !cover || !title || !artist || !statusText || !eqIcon || !progressBar) return;
+  if (!card || !cover || !title || !artist || !statusText || !eqIcon || !progressBar) return;
 
-if (track.title) {
-if (track.id && track.id !== lastTrackId) {
-  lastTrackId = track.id;
-  fetchAudioFeatures(track.id).then(features => {
-    if (features && features.tempo) {
-      currentBpm = features.tempo;
+  if (track.title) {
+    if (track.id && track.id !== lastTrackId) {
+      lastTrackId = track.id;
+      // Pobieranie BPM - domyślnie 120, a jeśli dodamy logikę do backendu, wpadnie tu wartość docelowa
+      currentBpm = track.tempo || 120;
       const speedMultiplier = Math.max(0.45, Math.min(1.8, 120 / currentBpm));
       document.documentElement.style.setProperty('--bpm-speed-mult', speedMultiplier.toFixed(2));
-    } else {
-      currentBpm = 120;
-      document.documentElement.style.setProperty('--bpm-speed-mult', '1');
     }
-  });
-}
 
-if (cover.dataset.rawSrc !== track.albumImageUrl) {
-cover.dataset.rawSrc = track.albumImageUrl;
-cover.src = track.albumImageUrl;
-extractPaletteFromUrl(track.albumImageUrl).then(colors => {
-  if (!colors) return;
-  if (colors.isGrayscale) {
-    isGrayscale = true;
-    document.documentElement.style.setProperty('--dynamic-accent', '#94a3b8');
-    document.documentElement.style.setProperty('--dynamic-accent-2', '#cbd5e1');
+    if (cover.dataset.rawSrc !== track.albumImageUrl) {
+      cover.dataset.rawSrc = track.albumImageUrl;
+      cover.src = track.albumImageUrl;
+      extractPaletteFromUrl(track.albumImageUrl).then(colors => {
+        if (!colors) return;
+        if (colors.isGrayscale) {
+          isGrayscale = true;
+          document.documentElement.style.setProperty('--dynamic-accent', '#94a3b8');
+          document.documentElement.style.setProperty('--dynamic-accent-2', '#cbd5e1');
+        } else {
+          isGrayscale = false;
+          targetHue1 = colors.c1;
+          targetHue2 = colors.c2;
+          document.documentElement.style.setProperty('--dynamic-accent', `hsl(${colors.c1}, 70%, 55%)`);
+          document.documentElement.style.setProperty('--dynamic-accent-2', `hsl(${colors.c2}, 70%, 55%)`);
+        }
+      });
+    }
+    title.innerText = track.title;
+    artist.innerText = track.artist;
+    card.href = track.songUrl || 'https://open.spotify.com';
+
+    if (track.isPlaying) {
+      statusText.innerText = 'Now Playing';
+      eqIcon.style.display = 'flex';
+      isMusicActive = true;
+      if (track.progressMs && track.durationMs) {
+        const pct = (track.progressMs / track.durationMs) * 100;
+        progressBar.style.width = `${pct}%`;
+      }
+    } else {
+      statusText.innerText = 'Ostatnio słuchane';
+      eqIcon.style.display = 'none';
+      progressBar.style.width = '0%';
+      isMusicActive = false;
+    }
   } else {
-    isGrayscale = false;
-    targetHue1 = colors.c1;
-    targetHue2 = colors.c2;
-    document.documentElement.style.setProperty('--dynamic-accent', `hsl(${colors.c1}, 70%, 55%)`);
-    document.documentElement.style.setProperty('--dynamic-accent-2', `hsl(${colors.c2}, 70%, 55%)`);
+    title.innerText = 'Brak aktywności';
+    artist.innerText = 'Nic obecnie nie leci';
+    card.href = 'https://open.spotify.com';
+    statusText.innerText = 'Spotify';
+    eqIcon.style.display = 'none';
+    progressBar.style.width = '0%';
+    currentBpm = 120;
+    document.documentElement.style.setProperty('--bpm-speed-mult', '1');
+    isMusicActive = false;
   }
-});
-}
-title.innerText = track.title;
-artist.innerText = track.artist;
-card.href = track.songUrl || 'https://open.spotify.com';
-
-if (track.isPlaying) {
-statusText.innerText = 'Now Playing';
-eqIcon.style.display = 'flex';
-isMusicActive = true;
-if (track.progressMs && track.durationMs) {
-const pct = (track.progressMs / track.durationMs) * 100;
-progressBar.style.width = `${pct}%`;
-}
-} else {
-statusText.innerText = 'Ostatnio słuchane';
-eqIcon.style.display = 'none';
-progressBar.style.width = '0%';
-isMusicActive = false;
-}
-} else {
-title.innerText = 'Brak aktywności';
-artist.innerText = 'Nic obecnie nie leci';
-card.href = 'https://open.spotify.com';
-statusText.innerText = 'Spotify';
-eqIcon.style.display = 'none';
-progressBar.style.width = '0%';
-currentBpm = 120;
-document.documentElement.style.setProperty('--bpm-speed-mult', '1');
-isMusicActive = false;
-}
 }
 updateSpotifyCard();
 setInterval(updateSpotifyCard, 5000);
