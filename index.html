@@ -440,13 +440,14 @@ let blobs = [];
 function initBlobs() {
   const isMobile = width < 768;
   const baseDim = Math.min(width, height);
-  const baseRadius = isMobile ? baseDim * 0.58 : Math.max(520, baseDim * 0.65);
+  // Zwiększenie bazowego rozmiaru dla mobile (2x) i proporcjonalnie dla desktopu
+  const baseRadius = isMobile ? baseDim * 0.76 : Math.max(520, baseDim * 0.65);
 
   blobs = [
-    { xRatio: 0.3, yRatio: 0.3, radius: baseRadius * 1.25, type: 1, speed: 0.0016, factor: isMobile ? 0.4 : 0.25 },
-    { xRatio: 0.7, yRatio: 0.65, radius: baseRadius * 1.35, type: 2, speed: 0.0013, factor: isMobile ? -0.4 : -0.25 },
-    { xRatio: 0.5, yRatio: 0.45, radius: baseRadius * 1.15, type: 1, speed: 0.0020, factor: isMobile ? 0.45 : 0.30 },
-    { xRatio: 0.25, yRatio: 0.8, radius: baseRadius * 1.20, type: 2, speed: 0.0011, factor: isMobile ? -0.35 : -0.20 }
+    { xRatio: 0.3, yRatio: 0.3, radius: baseRadius * 1.25, type: 1, speed: 0.0008, factor: isMobile ? 0.25 : 0.25 },
+    { xRatio: 0.7, yRatio: 0.65, radius: baseRadius * 1.35, type: 2, speed: 0.00065, factor: isMobile ? -0.25 : -0.25 },
+    { xRatio: 0.5, yRatio: 0.45, radius: baseRadius * 1.15, type: 1, speed: 0.0010, factor: isMobile ? 0.30 : 0.30 },
+    { xRatio: 0.25, yRatio: 0.8, radius: baseRadius * 1.20, type: 2, speed: 0.00055, factor: isMobile ? -0.20 : -0.20 }
   ];
 }
 initBlobs();
@@ -481,12 +482,12 @@ let time = 0;
 function renderCanvas() {
 time += 1;
 const isMobile = width < 768;
-const orbitMultiplierX = isMobile ? 0.38 : 0.25;
-const orbitMultiplierY = isMobile ? 0.38 : 0.25;
+const orbitMultiplierX = isMobile ? 0.30 : 0.25;
+const orbitMultiplierY = isMobile ? 0.30 : 0.25;
 
 if (!isTouching) {
-mouse.targetX = width / 2 + Math.sin(time * 0.015) * (width * (isMobile ? 0.45 : 0.35));
-mouse.targetY = height / 2 + Math.cos(time * 0.011) * (height * (isMobile ? 0.45 : 0.35));
+mouse.targetX = width / 2 + Math.sin(time * 0.007) * (width * (isMobile ? 0.35 : 0.35));
+mouse.targetY = height / 2 + Math.cos(time * 0.005) * (height * (isMobile ? 0.35 : 0.35));
 }
 mouse.x += (mouse.targetX - mouse.x) * 0.05;
 mouse.y += (mouse.targetY - mouse.y) * 0.05;
