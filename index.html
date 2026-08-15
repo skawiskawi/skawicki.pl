@@ -84,9 +84,9 @@ display: flex;
 flex-direction: column;
 justify-content: space-between;
 align-items: center;
-padding: clamp(20px, 3vh, 32px) 20px;
-padding-top: max(clamp(20px, 3vh, 32px), env(safe-area-inset-top));
-padding-bottom: max(clamp(20px, 3vh, 32px), env(safe-area-inset-bottom));
+padding: clamp(16px, 2.5vh, 28px) 20px;
+padding-top: max(clamp(16px, 2.5vh, 28px), env(safe-area-inset-top));
+padding-bottom: max(clamp(16px, 2.5vh, 28px), env(safe-area-inset-bottom));
 perspective: 1000px;
 }
 .header-spacer {
@@ -98,7 +98,7 @@ max-width: 310px;
 display: flex;
 flex-direction: column;
 align-items: center;
-gap: clamp(14px, 2.5vh, 22px);
+gap: clamp(12px, 2vh, 18px);
 margin: auto 0;
 }
 .sound-wave-container {
@@ -112,23 +112,18 @@ user-select: none;
 transition: opacity 0.5s ease;
 animation: stagger-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 animation-delay: 0.05s;
-/* DODANA MASKA: wygasza miękko brzegi w obrębie 20% szerokości, definitywnie ucinając twarde krawędzie */
--webkit-mask-image: linear-gradient(to right, transparent 0%, black 20%, black 80%, transparent 100%);
-mask-image: linear-gradient(to right, transparent 0%, black 20%, black 80%, transparent 100%);
+/* Czysty kod - usunięto wszystkie filtry, maski i shadow, robimy to tylko na canvasie */
 }
 #soundwave-canvas {
 width: 100%;
 height: 100%;
 display: block;
-/* Efekt blasku wrzucony tutaj na canvas, by bezproblemowo współpracował z maską nałożoną na kontener w WebKit */
-filter: drop-shadow(0 0 12px var(--dynamic-accent));
-transition: filter 0.8s ease;
 }
 .links-wrapper {
 width: 100%;
 display: flex;
 flex-direction: column;
-gap: 9px;
+gap: 8px;
 }
 .link-btn {
 position: relative;
@@ -137,7 +132,7 @@ align-items: center;
 justify-content: center;
 gap: 10px;
 width: 100%;
-min-height: 42px;
+min-height: 40px;
 padding: 9px 16px;
 background: var(--card-bg);
 border: 1px solid var(--card-border);
@@ -196,7 +191,7 @@ display: flex;
 align-items: center;
 justify-content: center;
 width: 100%;
-margin: 6px 0 2px 0;
+margin: 4px 0 2px 0;
 gap: 12px;
 animation: stagger-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
@@ -215,8 +210,8 @@ color: rgba(255, 255, 255, 0.3);
 }
 .spotify-widget {
 width: 100%;
-margin-top: 4px;
-padding: 10px 14px 12px 14px;
+margin-top: 2px;
+padding: 9px 13px 11px 13px;
 background: rgba(255, 255, 255, 0.025);
 border: 1px solid rgba(255, 255, 255, 0.07);
 border-radius: 16px;
@@ -360,11 +355,8 @@ transition: width 0.4s linear;
 
 /* Telegram Contact Button */
 .contact-wrapper {
-display: flex;
-align-items: center;
-justify-content: center;
-width: 100%;
-margin-top: 10px;
+margin-top: 6px;
+margin-bottom: 2px;
 animation: stagger-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 animation-delay: 0.48s;
 }
@@ -407,7 +399,7 @@ transform: scale(0.94) !important;
 
 footer {
 text-align: center;
-margin-top: 12px;
+margin-top: 10px;
 animation: stagger-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 animation-delay: 0.52s;
 }
@@ -490,7 +482,6 @@ GitHub
 <div id="spotify-progress" class="progress-bar"></div>
 </div>
 </a>
-
 <div class="contact-wrapper">
 <a href="https://t.me/pawulonrulon" target="_blank" rel="noopener noreferrer" class="contact-icon-btn tilt-card" title="Napisz na Telegramie" aria-label="Telegram" data-umami-event="click-telegram">
 <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
@@ -683,7 +674,7 @@ if (waveCanvas) {
   let wavePhase1 = 0;
   let wavePhase2 = 0;
   let wavePhase3 = 0;
-  let currentAmp = 0;
+  let currentAmp = 0; // 0 = flatline, 1 = full active wave
   let ekgTime = 0;
 
   function getEkgSpike(norm) {
@@ -707,23 +698,31 @@ if (waveCanvas) {
     ekgTime += 0.016;
 
     wCtx.clearRect(0, 0, wWidth, wHeight);
+    
+    // PRZEBUDOWA: Matematyczny padding chroniący przed ucięciem shadowBlur na brzegach canvasu.
     const centerY = wHeight / 2;
+    const pad = 36; // Margines bezpieczeństwa z obu stron (36px).
+    const drawW = wWidth - pad * 2; // Rzeczywisty obszar rysowania matematycznej fali
 
     const accent1 = isGrayscale ? 'hsl(0, 0%, 70%)' : `hsl(${currentHue1}, 85%, 60%)`;
     const accent2 = isGrayscale ? 'hsl(0, 0%, 55%)' : `hsl(${currentHue2}, 85%, 60%)`;
 
+    wCtx.lineCap = 'round'; // Zaokrąglenie końcówek linii na marginesach
+
     // Active Liquid Sine Waves
     if (currentAmp > 0.01) {
-      // Wave 3
+      // Wave 3 (Ambient Harmonic Ribbon)
       wCtx.save();
       wCtx.beginPath();
-      for (let x = 0; x <= wWidth; x += 2) {
-        const envelope = Math.sin((x / wWidth) * Math.PI) ** 1.3;
+      for (let x = 0; x <= drawW; x += 2) {
+        // Obwiednia matematycznie spłaszcza Y do zera dużo przed dotknięciem marginesu
+        const envelope = Math.sin((x / drawW) * Math.PI) ** 1.8;
+        const realX = pad + x;
         const y = centerY - (Math.sin(x * 0.032 + wavePhase3) * 8 + Math.cos(x * 0.015 - wavePhase3 * 0.7) * 5) * envelope * currentAmp;
-        if (x === 0) wCtx.moveTo(x, y);
-        else wCtx.lineTo(x, y);
+        if (x === 0) wCtx.moveTo(realX, y);
+        else wCtx.lineTo(realX, y);
       }
-      const grad3 = wCtx.createLinearGradient(0, 0, wWidth, 0);
+      const grad3 = wCtx.createLinearGradient(pad, 0, wWidth - pad, 0);
       grad3.addColorStop(0, 'rgba(0, 0, 0, 0)');
       grad3.addColorStop(0.18, isGrayscale ? 'rgba(200, 200, 200, 0.25)' : `hsla(${currentHue1}, 90%, 75%, ${0.35 * currentAmp})`);
       grad3.addColorStop(0.82, isGrayscale ? 'rgba(200, 200, 200, 0.25)' : `hsla(${currentHue1}, 90%, 75%, ${0.35 * currentAmp})`);
@@ -736,16 +735,17 @@ if (waveCanvas) {
       wCtx.stroke();
       wCtx.restore();
 
-      // Wave 2
+      // Wave 2 (Secondary Wave)
       wCtx.save();
       wCtx.beginPath();
-      for (let x = 0; x <= wWidth; x += 2) {
-        const envelope = Math.sin((x / wWidth) * Math.PI) ** 1.2;
+      for (let x = 0; x <= drawW; x += 2) {
+        const envelope = Math.sin((x / drawW) * Math.PI) ** 1.6;
+        const realX = pad + x;
         const y = centerY - (Math.sin(x * 0.020 - wavePhase2 + 1.2) * 12 + Math.cos(x * 0.035 + wavePhase2 * 0.6) * 6) * envelope * currentAmp;
-        if (x === 0) wCtx.moveTo(x, y);
-        else wCtx.lineTo(x, y);
+        if (x === 0) wCtx.moveTo(realX, y);
+        else wCtx.lineTo(realX, y);
       }
-      const grad2 = wCtx.createLinearGradient(0, 0, wWidth, 0);
+      const grad2 = wCtx.createLinearGradient(pad, 0, wWidth - pad, 0);
       grad2.addColorStop(0, 'rgba(0, 0, 0, 0)');
       grad2.addColorStop(0.15, isGrayscale ? 'rgba(255, 255, 255, 0.4)' : `hsla(${currentHue2}, 85%, 65%, ${0.65 * currentAmp})`);
       grad2.addColorStop(0.85, isGrayscale ? 'rgba(255, 255, 255, 0.4)' : `hsla(${currentHue2}, 85%, 65%, ${0.65 * currentAmp})`);
@@ -758,9 +758,9 @@ if (waveCanvas) {
       wCtx.stroke();
       wCtx.restore();
 
-      // Wave 1
+      // Wave 1 (Primary High-Glow Wave)
       wCtx.save();
-      const waveGrad = wCtx.createLinearGradient(0, 0, wWidth, 0);
+      const waveGrad = wCtx.createLinearGradient(pad, 0, wWidth - pad, 0);
       waveGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
       waveGrad.addColorStop(0.15, accent1);
       waveGrad.addColorStop(0.5, '#ffffff');
@@ -768,11 +768,12 @@ if (waveCanvas) {
       waveGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
       wCtx.beginPath();
-      for (let x = 0; x <= wWidth; x += 2) {
-        const envelope = Math.sin((x / wWidth) * Math.PI) ** 1.1;
+      for (let x = 0; x <= drawW; x += 2) {
+        const envelope = Math.sin((x / drawW) * Math.PI) ** 1.4;
+        const realX = pad + x;
         const y = centerY - (Math.sin(x * 0.024 + wavePhase1) * Math.cos(x * 0.012 + wavePhase1 * 0.6) * 16 + Math.sin(x * 0.048 - wavePhase1 * 1.1) * 4) * envelope * currentAmp;
-        if (x === 0) wCtx.moveTo(x, y);
-        else wCtx.lineTo(x, y);
+        if (x === 0) wCtx.moveTo(realX, y);
+        else wCtx.lineTo(realX, y);
       }
       wCtx.strokeStyle = waveGrad;
       wCtx.lineWidth = 2.8;
@@ -782,7 +783,7 @@ if (waveCanvas) {
       wCtx.restore();
     }
 
-    // Flatline & EKG Monitor
+    // Flatline & Cardiac Heartbeat Monitor (EKG)
     if (currentAmp < 0.99) {
       const flatlineWeight = 1 - currentAmp;
       const cycle = ekgTime % 3.6;
@@ -793,7 +794,7 @@ if (waveCanvas) {
       if (cycle < pulseDuration) {
         isPulsing = true;
         const progress = cycle / pulseDuration;
-        pulseX = progress * (wWidth + 80) - 40;
+        pulseX = progress * (drawW + 80) - 40;
       }
 
       wCtx.save();
@@ -802,7 +803,8 @@ if (waveCanvas) {
       let activePeakX = -1;
       let activePeakY = centerY;
 
-      for (let x = 0; x <= wWidth; x += 2) {
+      for (let x = 0; x <= drawW; x += 2) {
+        const realX = pad + x;
         let ekgOffset = 0;
         if (isPulsing) {
           const dx = x - pulseX;
@@ -811,7 +813,7 @@ if (waveCanvas) {
             const norm = dx / windowHalf;
             ekgOffset = getEkgSpike(norm) * flatlineWeight;
             if (ekgOffset > 10) {
-              activePeakX = x;
+              activePeakX = realX;
               activePeakY = centerY - ekgOffset;
             }
           }
@@ -819,15 +821,15 @@ if (waveCanvas) {
         const tremor = Math.sin(ekgTime * 10 + x * 0.08) * 0.4 * flatlineWeight;
         const y = centerY - ekgOffset + tremor;
 
-        if (x === 0) wCtx.moveTo(x, y);
-        else wCtx.lineTo(x, y);
+        if (x === 0) wCtx.moveTo(realX, y);
+        else wCtx.lineTo(realX, y);
       }
 
-      const flatGrad = wCtx.createLinearGradient(0, 0, wWidth, 0);
+      const flatGrad = wCtx.createLinearGradient(pad, 0, wWidth - pad, 0);
       flatGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
-      flatGrad.addColorStop(0.18, `hsla(${currentHue1}, 70%, 55%, ${0.35 * flatlineWeight})`);
-      flatGrad.addColorStop(0.5, `hsla(0, 0%, 100%, ${0.9 * flatlineWeight})`);
-      flatGrad.addColorStop(0.82, `hsla(${currentHue2}, 70%, 55%, ${0.35 * flatlineWeight})`);
+      flatGrad.addColorStop(0.18, `hsla(${currentHue1}, 70%, 55%, ${0.25 * flatlineWeight})`);
+      flatGrad.addColorStop(0.5, `hsla(0, 0%, 100%, ${0.85 * flatlineWeight})`);
+      flatGrad.addColorStop(0.82, `hsla(${currentHue2}, 70%, 55%, ${0.25 * flatlineWeight})`);
       flatGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
       wCtx.strokeStyle = flatGrad;
@@ -836,7 +838,8 @@ if (waveCanvas) {
       wCtx.shadowBlur = 10;
       wCtx.stroke();
 
-      if (activePeakX > 0 && activePeakX < wWidth) {
+      // Glowing cardiac light bead on the pulse tip
+      if (activePeakX > pad && activePeakX < wWidth - pad) {
         wCtx.beginPath();
         wCtx.arc(activePeakX, activePeakY, 2.5, 0, Math.PI * 2);
         wCtx.fillStyle = '#ffffff';
