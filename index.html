@@ -657,97 +657,19 @@ card.addEventListener('mouseleave', () => {
 card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)`;
 });
 });
-const SPOTIFY_CONFIG = {
-CLIENT_ID: '2d54be40e04943efa086ed8358ab169c',
-CLIENT_SECRET: '09ee688d79a24eb9a1148d573a814bac',
-REFRESH_TOKEN: 'AQDM9YXagkIir6H-QPfVa5MIcNJHqCNTi3GOnvOQ91QEEQg2CDCVuMicMqxHyOgxWqa746kwtHy7PLdhdWGPWiw3w29n0qkB7y1yahCX3ldFd8EMyQvnfYkWNJOk423Ydhc'
-};
-const TOKEN_ENDPOINT = `https://accounts.spotify.com/api/token`;
-const NOW_PLAYING_ENDPOINT = `https://api.spotify.com/v1/me/player/currently-playing`;
-const RECENTLY_PLAYED_ENDPOINT = `https://api.spotify.com/v1/me/player/recently-played?limit=1`;
-let cachedAccessToken = null;
-async function getAccessToken() {
-if (cachedAccessToken) return cachedAccessToken;
-try {
-const basic = btoa(`${SPOTIFY_CONFIG.CLIENT_ID}:${SPOTIFY_CONFIG.CLIENT_SECRET}`);
-const response = await fetch(TOKEN_ENDPOINT, {
-method: 'POST',
-headers: {
-'Authorization': `Basic ${basic}`,
-'Content-Type': 'application/x-www-form-urlencoded'
-},
-body: new URLSearchParams({
-grant_type: 'refresh_token',
-refresh_token: SPOTIFY_CONFIG.REFRESH_TOKEN
-})
-});
-if (!response.ok) return null;
-const data = await response.json();
-cachedAccessToken = data.access_token;
-setTimeout(() => {
-cachedAccessToken = null;
-}, 3500000);
-return cachedAccessToken;
-} catch (err) {
-return null;
-}
-}
-async function fetchSpotifyApi(endpoint) {
-let token = await getAccessToken();
-if (!token) return null;
-let res = await fetch(endpoint, {
-headers: { Authorization: `Bearer ${token}` }
-});
-if (res.status === 401) {
-cachedAccessToken = null;
-token = await getAccessToken();
-if (!token) return null;
-res = await fetch(endpoint, {
-headers: { Authorization: `Bearer ${token}` }
-});
-}
-return res;
-}
+
 async function getSpotifyStatus() {
-try {
-const nowPlayingRes = await fetchSpotifyApi(NOW_PLAYING_ENDPOINT);
-if (nowPlayingRes && nowPlayingRes.status === 200) {
-const data = await nowPlayingRes.json();
-if (data && data.item) {
-return {
-isPlaying: data.is_playing,
-isRecentlyPlayed: false,
-title: data.item.name,
-artist: data.item.artists.map(a => a.name).join(', '),
-albumImageUrl: data.item.album.images[0]?.url,
-songUrl: data.item.external_urls.spotify,
-progressMs: data.progress_ms,
-durationMs: data.item.duration_ms
-};
+  try {
+    const res = await fetch('/api/spotify');
+    if (res.ok) {
+      return await res.json();
+    }
+    return { isPlaying: false, isRecentlyPlayed: false };
+  } catch (err) {
+    return { isPlaying: false, isRecentlyPlayed: false };
+  }
 }
-}
-const recentlyRes = await fetchSpotifyApi(RECENTLY_PLAYED_ENDPOINT);
-if (recentlyRes && recentlyRes.status === 200) {
-const recentData = await recentlyRes.json();
-const lastTrack = recentData.items[0]?.track;
-if (lastTrack) {
-return {
-isPlaying: false,
-isRecentlyPlayed: true,
-title: lastTrack.name,
-artist: lastTrack.artists.map(a => a.name).join(', '),
-albumImageUrl: lastTrack.album.images[0]?.url,
-songUrl: lastTrack.external_urls.spotify,
-progressMs: 0,
-durationMs: 0
-};
-}
-}
-return { isPlaying: false, isRecentlyPlayed: false };
-} catch (err) {
-return { isPlaying: false, isRecentlyPlayed: false };
-}
-}
+
 async function updateSpotifyCard() {
 const track = await getSpotifyStatus();
 const card = document.getElementById('spotify-card');
