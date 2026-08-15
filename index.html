@@ -84,9 +84,9 @@ display: flex;
 flex-direction: column;
 justify-content: space-between;
 align-items: center;
-padding: clamp(20px, 3vh, 32px) 20px;
-padding-top: max(clamp(20px, 3vh, 32px), env(safe-area-inset-top));
-padding-bottom: max(clamp(20px, 3vh, 32px), env(safe-area-inset-bottom));
+padding: clamp(16px, 2.5vh, 28px) 20px;
+padding-top: max(clamp(16px, 2.5vh, 28px), env(safe-area-inset-top));
+padding-bottom: max(clamp(16px, 2.5vh, 28px), env(safe-area-inset-bottom));
 perspective: 1000px;
 }
 .header-spacer {
@@ -98,7 +98,7 @@ max-width: 310px;
 display: flex;
 flex-direction: column;
 align-items: center;
-gap: clamp(14px, 2.5vh, 22px);
+gap: clamp(12px, 2vh, 18px);
 margin: auto 0;
 }
 .sound-wave-container {
@@ -109,23 +109,26 @@ align-items: center;
 justify-content: center;
 position: relative;
 user-select: none;
-filter: drop-shadow(0 0 16px var(--dynamic-accent));
-transition: filter 0.8s ease, opacity 0.5s ease;
+transition: opacity 0.5s ease;
 animation: stagger-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 animation-delay: 0.05s;
--webkit-mask-image: linear-gradient(to right, transparent 0%, black 18%, black 82%, transparent 100%);
-mask-image: linear-gradient(to right, transparent 0%, black 18%, black 82%, transparent 100%);
+/* Wygaszanie krawędzi kontenera - ulepszony kąt 'to right' i gładsze 20% przejście. Wygasi rzucany przez wewnętrzny canvas drop-shadow. */
+-webkit-mask-image: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 20%, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%);
+mask-image: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 20%, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%);
 }
 #soundwave-canvas {
 width: 100%;
 height: 100%;
 display: block;
+/* Efekt glow przeniesiony na canvas, by maska rodzica zadziałała prawidłowo. */
+filter: drop-shadow(0 0 16px var(--dynamic-accent));
+transition: filter 0.8s ease;
 }
 .links-wrapper {
 width: 100%;
 display: flex;
 flex-direction: column;
-gap: 9px;
+gap: 8px;
 }
 .link-btn {
 position: relative;
@@ -134,7 +137,7 @@ align-items: center;
 justify-content: center;
 gap: 10px;
 width: 100%;
-min-height: 42px;
+min-height: 40px;
 padding: 9px 16px;
 background: var(--card-bg);
 border: 1px solid var(--card-border);
@@ -193,7 +196,7 @@ display: flex;
 align-items: center;
 justify-content: center;
 width: 100%;
-margin: 6px 0 2px 0;
+margin: 4px 0 2px 0;
 gap: 12px;
 animation: stagger-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
@@ -212,8 +215,8 @@ color: rgba(255, 255, 255, 0.3);
 }
 .spotify-widget {
 width: 100%;
-margin-top: 4px;
-padding: 10px 14px 12px 14px;
+margin-top: 2px;
+padding: 9px 13px 11px 13px;
 background: rgba(255, 255, 255, 0.025);
 border: 1px solid rgba(255, 255, 255, 0.07);
 border-radius: 16px;
@@ -355,12 +358,10 @@ background: linear-gradient(90deg, var(--dynamic-accent), var(--dynamic-accent-2
 transition: width 0.4s linear;
 }
 
+/* Telegram Contact Button */
 .contact-wrapper {
-display: flex;
-align-items: center;
-justify-content: center;
-width: 100%;
-margin-top: 10px;
+margin-top: 6px;
+margin-bottom: 2px;
 animation: stagger-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 animation-delay: 0.48s;
 }
@@ -383,8 +384,8 @@ will-change: transform;
 transform-style: preserve-3d;
 }
 .contact-icon-btn svg {
-width: 18px;
-height: 18px;
+width: 16px;
+height: 16px;
 fill: currentColor;
 transition: transform 0.2s ease;
 }
@@ -403,7 +404,7 @@ transform: scale(0.94) !important;
 
 footer {
 text-align: center;
-margin-top: 12px;
+margin-top: 10px;
 animation: stagger-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 animation-delay: 0.52s;
 }
@@ -486,10 +487,9 @@ GitHub
 <div id="spotify-progress" class="progress-bar"></div>
 </div>
 </a>
-
 <div class="contact-wrapper">
-<a href="https://t.me/pawulonrulon" target="_blank" rel="noopener noreferrer" class="contact-icon-btn tilt-card" title="Telegram" aria-label="Telegram" data-umami-event="click-telegram">
-<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.05-.2-.06-.05-.16-.03-.24-.02-.11.02-1.79 1.14-5.06 3.35-.48.33-.91.49-1.3.48-.43-.01-1.25-.24-1.86-.44-.75-.24-1.35-.37-1.3-.78.03-.21.32-.43.89-.66 3.5-1.52 5.83-2.53 7-3.01 3.33-1.39 4.02-1.63 4.48-1.64.1 0 .32.02.47.14.12.1.16.24.17.34 0 .07.01.21 0 .28z"/></svg>
+<a href="https://t.me/pawulonrulon" target="_blank" rel="noopener noreferrer" class="contact-icon-btn tilt-card" title="Napisz na Telegramie" aria-label="Telegram" data-umami-event="click-telegram">
+<svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
 </a>
 </div>
 </div>
@@ -679,7 +679,7 @@ if (waveCanvas) {
   let wavePhase1 = 0;
   let wavePhase2 = 0;
   let wavePhase3 = 0;
-  let currentAmp = 0;
+  let currentAmp = 0; // 0 = flatline, 1 = full active wave
   let ekgTime = 0;
 
   function getEkgSpike(norm) {
@@ -710,7 +710,7 @@ if (waveCanvas) {
 
     // Active Liquid Sine Waves
     if (currentAmp > 0.01) {
-      // Wave 3
+      // Wave 3 (Ambient Harmonic Ribbon)
       wCtx.save();
       wCtx.beginPath();
       for (let x = 0; x <= wWidth; x += 2) {
@@ -732,7 +732,7 @@ if (waveCanvas) {
       wCtx.stroke();
       wCtx.restore();
 
-      // Wave 2
+      // Wave 2 (Secondary Wave)
       wCtx.save();
       wCtx.beginPath();
       for (let x = 0; x <= wWidth; x += 2) {
@@ -754,7 +754,7 @@ if (waveCanvas) {
       wCtx.stroke();
       wCtx.restore();
 
-      // Wave 1
+      // Wave 1 (Primary High-Glow Wave)
       wCtx.save();
       const waveGrad = wCtx.createLinearGradient(0, 0, wWidth, 0);
       waveGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
@@ -778,7 +778,7 @@ if (waveCanvas) {
       wCtx.restore();
     }
 
-    // Flatline & EKG Monitor
+    // Flatline & Cardiac Heartbeat Monitor (EKG)
     if (currentAmp < 0.99) {
       const flatlineWeight = 1 - currentAmp;
       const cycle = ekgTime % 3.6;
@@ -821,9 +821,9 @@ if (waveCanvas) {
 
       const flatGrad = wCtx.createLinearGradient(0, 0, wWidth, 0);
       flatGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
-      flatGrad.addColorStop(0.18, `hsla(${currentHue1}, 70%, 55%, ${0.35 * flatlineWeight})`);
-      flatGrad.addColorStop(0.5, `hsla(0, 0%, 100%, ${0.9 * flatlineWeight})`);
-      flatGrad.addColorStop(0.82, `hsla(${currentHue2}, 70%, 55%, ${0.35 * flatlineWeight})`);
+      flatGrad.addColorStop(0.18, `hsla(${currentHue1}, 70%, 55%, ${0.25 * flatlineWeight})`);
+      flatGrad.addColorStop(0.5, `hsla(0, 0%, 100%, ${0.85 * flatlineWeight})`);
+      flatGrad.addColorStop(0.82, `hsla(${currentHue2}, 70%, 55%, ${0.25 * flatlineWeight})`);
       flatGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
       wCtx.strokeStyle = flatGrad;
@@ -832,6 +832,7 @@ if (waveCanvas) {
       wCtx.shadowBlur = 10;
       wCtx.stroke();
 
+      // Glowing cardiac light bead on the pulse tip
       if (activePeakX > 0 && activePeakX < wWidth) {
         wCtx.beginPath();
         wCtx.arc(activePeakX, activePeakY, 2.5, 0, Math.PI * 2);
