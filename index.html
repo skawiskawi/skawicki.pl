@@ -84,9 +84,9 @@ display: flex;
 flex-direction: column;
 justify-content: space-between;
 align-items: center;
-padding: clamp(16px, 2.5vh, 28px) 20px;
-padding-top: max(clamp(16px, 2.5vh, 28px), env(safe-area-inset-top));
-padding-bottom: max(clamp(16px, 2.5vh, 28px), env(safe-area-inset-bottom));
+padding: clamp(20px, 3vh, 32px) 20px;
+padding-top: max(clamp(20px, 3vh, 32px), env(safe-area-inset-top));
+padding-bottom: max(clamp(20px, 3vh, 32px), env(safe-area-inset-bottom));
 perspective: 1000px;
 }
 .header-spacer {
@@ -98,7 +98,7 @@ max-width: 310px;
 display: flex;
 flex-direction: column;
 align-items: center;
-gap: clamp(12px, 2vh, 18px);
+gap: clamp(14px, 2.5vh, 22px);
 margin: auto 0;
 }
 .sound-wave-container {
@@ -112,23 +112,23 @@ user-select: none;
 transition: opacity 0.5s ease;
 animation: stagger-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 animation-delay: 0.05s;
-/* Wygaszanie krawędzi kontenera - ulepszony kąt 'to right' i gładsze 20% przejście. Wygasi rzucany przez wewnętrzny canvas drop-shadow. */
--webkit-mask-image: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 20%, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%);
-mask-image: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 20%, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%);
+/* DODANA MASKA: wygasza miękko brzegi w obrębie 20% szerokości, definitywnie ucinając twarde krawędzie */
+-webkit-mask-image: linear-gradient(to right, transparent 0%, black 20%, black 80%, transparent 100%);
+mask-image: linear-gradient(to right, transparent 0%, black 20%, black 80%, transparent 100%);
 }
 #soundwave-canvas {
 width: 100%;
 height: 100%;
 display: block;
-/* Efekt glow przeniesiony na canvas, by maska rodzica zadziałała prawidłowo. */
-filter: drop-shadow(0 0 16px var(--dynamic-accent));
+/* Efekt blasku wrzucony tutaj na canvas, by bezproblemowo współpracował z maską nałożoną na kontener w WebKit */
+filter: drop-shadow(0 0 12px var(--dynamic-accent));
 transition: filter 0.8s ease;
 }
 .links-wrapper {
 width: 100%;
 display: flex;
 flex-direction: column;
-gap: 8px;
+gap: 9px;
 }
 .link-btn {
 position: relative;
@@ -137,7 +137,7 @@ align-items: center;
 justify-content: center;
 gap: 10px;
 width: 100%;
-min-height: 40px;
+min-height: 42px;
 padding: 9px 16px;
 background: var(--card-bg);
 border: 1px solid var(--card-border);
@@ -196,7 +196,7 @@ display: flex;
 align-items: center;
 justify-content: center;
 width: 100%;
-margin: 4px 0 2px 0;
+margin: 6px 0 2px 0;
 gap: 12px;
 animation: stagger-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
@@ -215,8 +215,8 @@ color: rgba(255, 255, 255, 0.3);
 }
 .spotify-widget {
 width: 100%;
-margin-top: 2px;
-padding: 9px 13px 11px 13px;
+margin-top: 4px;
+padding: 10px 14px 12px 14px;
 background: rgba(255, 255, 255, 0.025);
 border: 1px solid rgba(255, 255, 255, 0.07);
 border-radius: 16px;
@@ -360,8 +360,11 @@ transition: width 0.4s linear;
 
 /* Telegram Contact Button */
 .contact-wrapper {
-margin-top: 6px;
-margin-bottom: 2px;
+display: flex;
+align-items: center;
+justify-content: center;
+width: 100%;
+margin-top: 10px;
 animation: stagger-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 animation-delay: 0.48s;
 }
@@ -404,7 +407,7 @@ transform: scale(0.94) !important;
 
 footer {
 text-align: center;
-margin-top: 10px;
+margin-top: 12px;
 animation: stagger-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 animation-delay: 0.52s;
 }
@@ -487,6 +490,7 @@ GitHub
 <div id="spotify-progress" class="progress-bar"></div>
 </div>
 </a>
+
 <div class="contact-wrapper">
 <a href="https://t.me/pawulonrulon" target="_blank" rel="noopener noreferrer" class="contact-icon-btn tilt-card" title="Napisz na Telegramie" aria-label="Telegram" data-umami-event="click-telegram">
 <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
@@ -679,7 +683,7 @@ if (waveCanvas) {
   let wavePhase1 = 0;
   let wavePhase2 = 0;
   let wavePhase3 = 0;
-  let currentAmp = 0; // 0 = flatline, 1 = full active wave
+  let currentAmp = 0;
   let ekgTime = 0;
 
   function getEkgSpike(norm) {
@@ -710,7 +714,7 @@ if (waveCanvas) {
 
     // Active Liquid Sine Waves
     if (currentAmp > 0.01) {
-      // Wave 3 (Ambient Harmonic Ribbon)
+      // Wave 3
       wCtx.save();
       wCtx.beginPath();
       for (let x = 0; x <= wWidth; x += 2) {
@@ -732,7 +736,7 @@ if (waveCanvas) {
       wCtx.stroke();
       wCtx.restore();
 
-      // Wave 2 (Secondary Wave)
+      // Wave 2
       wCtx.save();
       wCtx.beginPath();
       for (let x = 0; x <= wWidth; x += 2) {
@@ -754,7 +758,7 @@ if (waveCanvas) {
       wCtx.stroke();
       wCtx.restore();
 
-      // Wave 1 (Primary High-Glow Wave)
+      // Wave 1
       wCtx.save();
       const waveGrad = wCtx.createLinearGradient(0, 0, wWidth, 0);
       waveGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
@@ -778,7 +782,7 @@ if (waveCanvas) {
       wCtx.restore();
     }
 
-    // Flatline & Cardiac Heartbeat Monitor (EKG)
+    // Flatline & EKG Monitor
     if (currentAmp < 0.99) {
       const flatlineWeight = 1 - currentAmp;
       const cycle = ekgTime % 3.6;
@@ -821,9 +825,9 @@ if (waveCanvas) {
 
       const flatGrad = wCtx.createLinearGradient(0, 0, wWidth, 0);
       flatGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
-      flatGrad.addColorStop(0.18, `hsla(${currentHue1}, 70%, 55%, ${0.25 * flatlineWeight})`);
-      flatGrad.addColorStop(0.5, `hsla(0, 0%, 100%, ${0.85 * flatlineWeight})`);
-      flatGrad.addColorStop(0.82, `hsla(${currentHue2}, 70%, 55%, ${0.25 * flatlineWeight})`);
+      flatGrad.addColorStop(0.18, `hsla(${currentHue1}, 70%, 55%, ${0.35 * flatlineWeight})`);
+      flatGrad.addColorStop(0.5, `hsla(0, 0%, 100%, ${0.9 * flatlineWeight})`);
+      flatGrad.addColorStop(0.82, `hsla(${currentHue2}, 70%, 55%, ${0.35 * flatlineWeight})`);
       flatGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
       wCtx.strokeStyle = flatGrad;
@@ -832,7 +836,6 @@ if (waveCanvas) {
       wCtx.shadowBlur = 10;
       wCtx.stroke();
 
-      // Glowing cardiac light bead on the pulse tip
       if (activePeakX > 0 && activePeakX < wWidth) {
         wCtx.beginPath();
         wCtx.arc(activePeakX, activePeakY, 2.5, 0, Math.PI * 2);
