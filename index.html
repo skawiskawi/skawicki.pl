@@ -12,13 +12,14 @@
 <style>
 :root {
 --bg-dark: #050608;
---card-bg: rgba(255, 255, 255, 0.03);
---card-border: rgba(255, 255, 255, 0.07);
---card-hover-bg: rgba(255, 255, 255, 0.06);
+--card-bg: rgba(255, 255, 255, 0.035);
+--card-border: rgba(255, 255, 255, 0.08);
+--card-hover-bg: rgba(255, 255, 255, 0.07);
 --text-main: #f8fafc;
 --text-muted: #64748b;
 --dynamic-accent: #1ed760;
 --dynamic-accent-2: #6366f1;
+--bpm-speed-mult: 1;
 }
 * {
 margin: 0;
@@ -61,6 +62,19 @@ transform: translate(-50%, -50%);
 transition: opacity 0.06s ease-out;
 will-change: opacity;
 }
+.noise-overlay {
+position: fixed;
+top: 0;
+left: 0;
+width: 100vw;
+height: 100dvh;
+pointer-events: none;
+z-index: 3;
+opacity: 0.035;
+mix-blend-mode: overlay;
+background-repeat: repeat;
+background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
 .container {
 position: relative;
 z-index: 5;
@@ -97,23 +111,25 @@ opacity: 0.9;
 user-select: none;
 filter: drop-shadow(0 0 12px var(--dynamic-accent));
 transition: filter 0.8s ease;
+animation: stagger-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+animation-delay: 0.05s;
 }
 .bar {
 width: 3.5px;
 height: 100%;
 background: linear-gradient(180deg, rgba(255,255,255,0.8), var(--dynamic-accent), var(--dynamic-accent-2));
 border-radius: 99px;
-animation: pulse-fast 0.6s ease-in-out infinite alternate;
+animation: pulse-fast calc(0.6s * var(--bpm-speed-mult)) ease-in-out infinite alternate;
 will-change: transform;
 transition: background 0.8s ease;
 }
-.bar:nth-child(1) { animation-duration: 0.42s; height: 60%; }
-.bar:nth-child(2) { animation-duration: 0.58s; height: 90%; }
-.bar:nth-child(3) { animation-duration: 0.35s; height: 100%; }
-.bar:nth-child(4) { animation-duration: 0.51s; height: 75%; }
-.bar:nth-child(5) { animation-duration: 0.39s; height: 85%; }
-.bar:nth-child(6) { animation-duration: 0.48s; height: 95%; }
-.bar:nth-child(7) { animation-duration: 0.54s; height: 65%; }
+.bar:nth-child(1) { animation-duration: calc(0.42s * var(--bpm-speed-mult)); height: 60%; }
+.bar:nth-child(2) { animation-duration: calc(0.58s * var(--bpm-speed-mult)); height: 90%; }
+.bar:nth-child(3) { animation-duration: calc(0.35s * var(--bpm-speed-mult)); height: 100%; }
+.bar:nth-child(4) { animation-duration: calc(0.51s * var(--bpm-speed-mult)); height: 75%; }
+.bar:nth-child(5) { animation-duration: calc(0.39s * var(--bpm-speed-mult)); height: 85%; }
+.bar:nth-child(6) { animation-duration: calc(0.48s * var(--bpm-speed-mult)); height: 95%; }
+.bar:nth-child(7) { animation-duration: calc(0.54s * var(--bpm-speed-mult)); height: 65%; }
 @keyframes pulse-fast {
 0% { transform: scaleY(0.15); }
 100% { transform: scaleY(1); }
@@ -141,12 +157,13 @@ text-decoration: none;
 font-size: 0.86rem;
 font-weight: 600;
 letter-spacing: 0.3px;
-backdrop-filter: blur(20px);
--webkit-backdrop-filter: blur(20px);
-transition: transform 0.15s ease-out, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+backdrop-filter: blur(24px) saturate(140%);
+-webkit-backdrop-filter: blur(24px) saturate(140%);
+transition: transform 0.18s cubic-bezier(0.25, 1, 0.5, 1), background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 transform-style: preserve-3d;
 will-change: transform;
+animation: stagger-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 .link-btn svg {
 width: 17px;
@@ -154,6 +171,23 @@ height: 17px;
 fill: currentColor;
 flex-shrink: 0;
 transition: transform 0.2s ease;
+}
+.links-wrapper a:nth-child(1) { animation-delay: 0.10s; }
+.links-wrapper a:nth-child(2) { animation-delay: 0.16s; }
+.links-wrapper a:nth-child(3) { animation-delay: 0.22s; }
+.links-wrapper div:nth-child(4) { animation-delay: 0.26s; }
+.links-wrapper a:nth-child(5) { animation-delay: 0.30s; }
+.links-wrapper div:nth-child(6) { animation-delay: 0.34s; }
+.links-wrapper a:nth-child(7) { animation-delay: 0.38s; }
+@keyframes stagger-in {
+0% {
+opacity: 0;
+transform: translateY(18px) scale(0.96);
+}
+100% {
+opacity: 1;
+transform: translateY(0) scale(1);
+}
 }
 @media (hover: hover) {
 .link-btn:hover { background: var(--card-hover-bg); }
@@ -173,6 +207,7 @@ justify-content: center;
 width: 100%;
 margin: 6px 0 2px 0;
 gap: 12px;
+animation: stagger-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 .section-divider::before, .section-divider::after {
 content: '';
@@ -191,22 +226,24 @@ color: rgba(255, 255, 255, 0.3);
 width: 100%;
 margin-top: 4px;
 padding: 10px 14px 12px 14px;
-background: rgba(255, 255, 255, 0.02);
-border: 1px solid rgba(255, 255, 255, 0.06);
+background: rgba(255, 255, 255, 0.025);
+border: 1px solid rgba(255, 255, 255, 0.07);
 border-radius: 16px;
-backdrop-filter: blur(24px);
--webkit-backdrop-filter: blur(24px);
+backdrop-filter: blur(28px) saturate(150%);
+-webkit-backdrop-filter: blur(28px) saturate(150%);
 display: flex;
 align-items: center;
 gap: 12px;
 text-decoration: none;
 color: inherit;
-transition: transform 0.15s ease-out, background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+transition: transform 0.18s cubic-bezier(0.25, 1, 0.5, 1), background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
 position: relative;
 overflow: hidden;
 will-change: transform;
 transform-style: preserve-3d;
+animation: stagger-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+animation-delay: 0.44s;
 }
 .spotify-widget::before {
 content: '';
@@ -332,6 +369,8 @@ transition: width 0.4s linear;
 footer {
 text-align: center;
 margin-top: 20px;
+animation: stagger-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+animation-delay: 0.5s;
 }
 .footer-text {
 font-size: clamp(0.75rem, 2vw, 0.85rem);
@@ -353,6 +392,7 @@ padding-left: 6px;
 </style>
 </head>
 <body>
+<div class="noise-overlay"></div>
 <canvas id="interactive-bg"></canvas>
 <div id="strobe-container"></div>
 <div class="container">
@@ -429,6 +469,9 @@ let targetHue2 = 300;
 let currentHue1 = 200;
 let currentHue2 = 300;
 let isGrayscale = false;
+let lastTrackId = null;
+let currentBpm = 120;
+
 const canvas = document.getElementById('interactive-bg');
 if (canvas) {
 const ctx = canvas.getContext('2d');
@@ -643,31 +686,134 @@ function extractPaletteFromUrl(imageUrl) {
 
 const tiltCards = document.querySelectorAll('.tilt-card');
 tiltCards.forEach(card => {
-card.addEventListener('mousemove', (e) => {
-const rect = card.getBoundingClientRect();
-const x = e.clientX - rect.left;
-const y = e.clientY - rect.top;
-const centerX = rect.width / 2;
-const centerY = rect.height / 2;
-const rotateX = ((y - centerY) / centerY) * -8;
-const rotateY = ((x - centerX) / centerX) * 8;
-card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-2px)`;
-});
-card.addEventListener('mouseleave', () => {
-card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)`;
-});
+  card.addEventListener('mousemove', (e) => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    
+    const rotateX = ((y - centerY) / centerY) * -7;
+    const rotateY = ((x - centerX) / centerX) * 7;
+    const transX = ((x - centerX) / centerX) * 4;
+    const transY = ((y - centerY) / centerY) * 4;
+
+    card.style.transform = `perspective(1000px) translate3d(${transX}px, ${transY}px, 0) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+  });
+
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = `perspective(1000px) translate3d(0px, 0px, 0) rotateX(0deg) rotateY(0deg)`;
+  });
 });
 
-async function getSpotifyStatus() {
+const SPOTIFY_CONFIG = {
+CLIENT_ID: '2d54be40e04943efa086ed8358ab169c',
+CLIENT_SECRET: '09ee688d79a24eb9a1148d573a814bac',
+REFRESH_TOKEN: 'AQDM9YXagkIir6H-QPfVa5MIcNJHqCNTi3GOnvOQ91QEEQg2CDCVuMicMqxHyOgxWqa746kwtHy7PLdhdWGPWiw3w29n0qkB7y1yahCX3ldFd8EMyQvnfYkWNJOk423Ydhc'
+};
+const TOKEN_ENDPOINT = `https://accounts.spotify.com/api/token`;
+const NOW_PLAYING_ENDPOINT = `https://api.spotify.com/v1/me/player/currently-playing`;
+const RECENTLY_PLAYED_ENDPOINT = `https://api.spotify.com/v1/me/player/recently-played?limit=1`;
+const AUDIO_FEATURES_ENDPOINT = `https://api.spotify.com/v1/audio-features/`;
+
+let cachedAccessToken = null;
+async function getAccessToken() {
+if (cachedAccessToken) return cachedAccessToken;
+try {
+const basic = btoa(`${SPOTIFY_CONFIG.CLIENT_ID}:${SPOTIFY_CONFIG.CLIENT_SECRET}`);
+const response = await fetch(TOKEN_ENDPOINT, {
+method: 'POST',
+headers: {
+'Authorization': `Basic ${basic}`,
+'Content-Type': 'application/x-www-form-urlencoded'
+},
+body: new URLSearchParams({
+grant_type: 'refresh_token',
+refresh_token: SPOTIFY_CONFIG.REFRESH_TOKEN
+})
+});
+if (!response.ok) return null;
+const data = await response.json();
+cachedAccessToken = data.access_token;
+setTimeout(() => {
+cachedAccessToken = null;
+}, 3500000);
+return cachedAccessToken;
+} catch (err) {
+return null;
+}
+}
+async function fetchSpotifyApi(endpoint) {
+let token = await getAccessToken();
+if (!token) return null;
+let res = await fetch(endpoint, {
+headers: { Authorization: `Bearer ${token}` }
+});
+if (res.status === 401) {
+cachedAccessToken = null;
+token = await getAccessToken();
+if (!token) return null;
+res = await fetch(endpoint, {
+headers: { Authorization: `Bearer ${token}` }
+});
+}
+return res;
+}
+
+async function fetchAudioFeatures(trackId) {
+  if (!trackId) return null;
   try {
-    const res = await fetch('/api/spotify');
-    if (res.ok) {
+    const res = await fetchSpotifyApi(`${AUDIO_FEATURES_ENDPOINT}${trackId}`);
+    if (res && res.status === 200) {
       return await res.json();
     }
-    return { isPlaying: false, isRecentlyPlayed: false };
-  } catch (err) {
-    return { isPlaying: false, isRecentlyPlayed: false };
+  } catch (e) {
+    return null;
   }
+  return null;
+}
+
+async function getSpotifyStatus() {
+try {
+const nowPlayingRes = await fetchSpotifyApi(NOW_PLAYING_ENDPOINT);
+if (nowPlayingRes && nowPlayingRes.status === 200) {
+const data = await nowPlayingRes.json();
+if (data && data.item) {
+return {
+id: data.item.id,
+isPlaying: data.is_playing,
+isRecentlyPlayed: false,
+title: data.item.name,
+artist: data.item.artists.map(a => a.name).join(', '),
+albumImageUrl: data.item.album.images[0]?.url,
+songUrl: data.item.external_urls.spotify,
+progressMs: data.progress_ms,
+durationMs: data.item.duration_ms
+};
+}
+}
+const recentlyRes = await fetchSpotifyApi(RECENTLY_PLAYED_ENDPOINT);
+if (recentlyRes && recentlyRes.status === 200) {
+const recentData = await recentlyRes.json();
+const lastTrack = recentData.items[0]?.track;
+if (lastTrack) {
+return {
+id: lastTrack.id,
+isPlaying: false,
+isRecentlyPlayed: true,
+title: lastTrack.name,
+artist: lastTrack.artists.map(a => a.name).join(', '),
+albumImageUrl: lastTrack.album.images[0]?.url,
+songUrl: lastTrack.external_urls.spotify,
+progressMs: 0,
+durationMs: 0
+};
+}
+}
+return { isPlaying: false, isRecentlyPlayed: false };
+} catch (err) {
+return { isPlaying: false, isRecentlyPlayed: false };
+}
 }
 
 async function updateSpotifyCard() {
@@ -680,7 +826,21 @@ const statusText = document.getElementById('spotify-status-text');
 const eqIcon = document.getElementById('eq-icon');
 const progressBar = document.getElementById('spotify-progress');
 if (!card || !cover || !title || !artist || !statusText || !eqIcon || !progressBar) return;
+
 if (track.title) {
+if (track.id && track.id !== lastTrackId) {
+  lastTrackId = track.id;
+  fetchAudioFeatures(track.id).then(features => {
+    if (features && features.tempo) {
+      currentBpm = features.tempo;
+      const speedMultiplier = Math.max(0.45, Math.min(1.8, 120 / currentBpm));
+      document.documentElement.style.setProperty('--bpm-speed-mult', speedMultiplier.toFixed(2));
+    } else {
+      document.documentElement.style.setProperty('--bpm-speed-mult', '1');
+    }
+  });
+}
+
 if (cover.dataset.rawSrc !== track.albumImageUrl) {
 cover.dataset.rawSrc = track.albumImageUrl;
 cover.src = track.albumImageUrl;
@@ -721,6 +881,7 @@ card.href = 'https://open.spotify.com';
 statusText.innerText = 'Spotify';
 eqIcon.style.display = 'none';
 progressBar.style.width = '0%';
+document.documentElement.style.setProperty('--bpm-speed-mult', '1');
 }
 }
 updateSpotifyCard();
