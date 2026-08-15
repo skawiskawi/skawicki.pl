@@ -307,20 +307,52 @@ width: 100%;
 }
 .album-cover-wrapper {
 position: relative;
-width: 40px;
-height: 40px;
+width: 44px;
+height: 44px;
 flex-shrink: 0;
-border-radius: 8px;
+border-radius: 10px;
 overflow: hidden;
 background: rgba(255, 255, 255, 0.05);
 box-shadow: 0 0 16px var(--dynamic-accent);
-transition: box-shadow 0.8s ease;
+transition: box-shadow 0.8s ease, transform 0.2s ease;
+cursor: pointer;
 }
 .album-cover {
 width: 100%;
 height: 100%;
 object-fit: cover;
-border-radius: 8px;
+border-radius: 10px;
+transition: filter 0.3s ease, transform 0.3s ease;
+}
+.preview-overlay {
+position: absolute;
+inset: 0;
+background: rgba(0, 0, 0, 0.55);
+backdrop-filter: blur(2px);
+-webkit-backdrop-filter: blur(2px);
+display: flex;
+align-items: center;
+justify-content: center;
+opacity: 0;
+transition: opacity 0.25s ease;
+border-radius: 10px;
+}
+.preview-overlay svg {
+width: 18px;
+height: 18px;
+fill: #ffffff;
+filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+transition: transform 0.2s ease;
+}
+.album-cover-wrapper:hover .preview-overlay,
+.album-cover-wrapper.is-playing-preview .preview-overlay {
+opacity: 1;
+}
+.album-cover-wrapper:hover .album-cover {
+transform: scale(1.05);
+}
+.album-cover-wrapper.is-playing-preview {
+box-shadow: 0 0 22px var(--dynamic-accent), 0 0 8px #ffffff;
 }
 .track-info {
 display: flex;
@@ -434,37 +466,41 @@ padding-left: 6px;
 <div class="bar"></div>
 </div>
 <main class="links-wrapper">
-<a href="https://open.spotify.com/user/313sruf6nyv7gp4wo5bnyon5wqf4" target="_blank" rel="noopener noreferrer" class="link-btn spotify tilt-card" data-umami-event="click-spotify">
+<a href="https://open.spotify.com/user/313sruf6nyv7gp4wo5bnyon5wqf4" target="_blank" rel="noopener noreferrer" class="link-btn spotify tilt-card">
 <svg viewBox="0 0 24 24"><path d="M12 0C5.376 0 0 5.376 0 12s5.376 12 12 12 12-5.376 12-12S18.624 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.899 4.62-1.02 8.58-.6 11.7 1.32.42.18.48.66.24 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141 C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.18-1.38-.72-.18-.6.18-1.2.72-1.38 4.26-1.26 11.28-1.02 15.72 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
 Spotify
 </a>
-<a href="https://genius.com/skawi" target="_blank" rel="noopener noreferrer" class="link-btn genius tilt-card" data-umami-event="click-genius">
+<a href="https://genius.com/skawi" target="_blank" rel="noopener noreferrer" class="link-btn genius tilt-card">
 <svg viewBox="0 0 24 24"><path d="M24 0H0v24h24V0zM4.8 19.2V4.8h4.8v14.4H4.8zm9.6 0h-3.6V4.8h3.6v14.4zm4.8 0h-3.6V4.8h3.6v14.4z"/></svg>
 Genius
 </a>
-<a href="https://stats.fm/skawi" target="_blank" rel="noopener noreferrer" class="link-btn statsfm tilt-card" data-umami-event="click-statsfm">
+<a href="https://stats.fm/skawi" target="_blank" rel="noopener noreferrer" class="link-btn statsfm tilt-card">
 <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
 Stats.fm
 </a>
 <div class="section-divider">
 <span>gaming</span>
 </div>
-<a href="https://fortnitetracker.com/profile/all/skawi" target="_blank" rel="noopener noreferrer" class="link-btn fortnite tilt-card" data-umami-event="click-fortnite">
+<a href="https://fortnitetracker.com/profile/all/skawi" target="_blank" rel="noopener noreferrer" class="link-btn fortnite tilt-card">
 <svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H9v2H7v-2H5v-2h2V9h2v2h2v2zm4.5 1c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3-3c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
 Fortnite Tracker
 </a>
 <div class="section-divider">
 <span>code</span>
 </div>
-<a href="https://github.com/skawiskawi" target="_blank" rel="noopener noreferrer" class="link-btn github tilt-card" data-umami-event="click-github">
+<a href="https://github.com/skawiskawi" target="_blank" rel="noopener noreferrer" class="link-btn github tilt-card">
 <svg viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
 GitHub
 </a>
 </main>
-<a id="spotify-card" href="#" target="_blank" class="spotify-widget tilt-card" data-umami-event="click-spotify-widget">
+<a id="spotify-card" href="#" target="_blank" class="spotify-widget tilt-card">
 <div class="spotify-widget-content">
-<div class="album-cover-wrapper">
+<div class="album-cover-wrapper" id="album-cover-trigger" title="Odtwórz / Zatrzymaj podgląd">
 <img id="spotify-cover" class="album-cover" src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2364748b'><path d='M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z'/></svg>" alt="Album Cover">
+<div class="preview-overlay" id="preview-overlay">
+<svg id="preview-play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+<svg id="preview-pause-icon" viewBox="0 0 24 24" style="display: none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+</div>
 </div>
 <div class="track-info">
 <div class="status-badge">
@@ -497,6 +533,9 @@ let currentHue2 = 300;
 let isGrayscale = false;
 let lastTrackId = null;
 let currentBpm = 120;
+let previewAudio = new Audio();
+let currentPreviewUrl = null;
+let isPreviewPlaying = false;
 
 const canvas = document.getElementById('interactive-bg');
 if (canvas) {
@@ -739,6 +778,52 @@ tiltCards.forEach(card => {
   });
 });
 
+const albumCoverTrigger = document.getElementById('album-cover-trigger');
+const playIcon = document.getElementById('preview-play-icon');
+const pauseIcon = document.getElementById('preview-pause-icon');
+
+function setPreviewPlaybackState(playing) {
+  isPreviewPlaying = playing;
+  if (albumCoverTrigger) {
+    if (playing) {
+      albumCoverTrigger.classList.add('is-playing-preview');
+      playIcon.style.display = 'none';
+      pauseIcon.style.display = 'block';
+    } else {
+      albumCoverTrigger.classList.remove('is-playing-preview');
+      playIcon.style.display = 'block';
+      pauseIcon.style.display = 'none';
+    }
+  }
+}
+
+if (albumCoverTrigger) {
+  albumCoverTrigger.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!currentPreviewUrl) return;
+
+    if (isPreviewPlaying) {
+      previewAudio.pause();
+      setPreviewPlaybackState(false);
+    } else {
+      if (previewAudio.src !== currentPreviewUrl) {
+        previewAudio.src = currentPreviewUrl;
+      }
+      previewAudio.play().then(() => {
+        setPreviewPlaybackState(true);
+      }).catch(() => {
+        setPreviewPlaybackState(false);
+      });
+    }
+  });
+
+  previewAudio.addEventListener('ended', () => {
+    setPreviewPlaybackState(false);
+  });
+}
+
 const SPOTIFY_CONFIG = {
 CLIENT_ID: '2d54be40e04943efa086ed8358ab169c',
 CLIENT_SECRET: '09ee688d79a24eb9a1148d573a814bac',
@@ -820,6 +905,7 @@ title: data.item.name,
 artist: data.item.artists.map(a => a.name).join(', '),
 albumImageUrl: data.item.album.images[0]?.url,
 songUrl: data.item.external_urls.spotify,
+previewUrl: data.item.preview_url,
 progressMs: data.progress_ms,
 durationMs: data.item.duration_ms
 };
@@ -838,6 +924,7 @@ title: lastTrack.name,
 artist: lastTrack.artists.map(a => a.name).join(', '),
 albumImageUrl: lastTrack.album.images[0]?.url,
 songUrl: lastTrack.external_urls.spotify,
+previewUrl: lastTrack.preview_url,
 progressMs: 0,
 durationMs: 0
 };
@@ -859,12 +946,22 @@ const statusText = document.getElementById('spotify-status-text');
 const eqIcon = document.getElementById('eq-icon');
 const progressBar = document.getElementById('spotify-progress');
 const mainSoundWave = document.getElementById('main-sound-wave');
+const previewOverlay = document.getElementById('preview-overlay');
 
 if (!card || !cover || !title || !artist || !statusText || !eqIcon || !progressBar) return;
 
 if (track.title) {
+currentPreviewUrl = track.previewUrl || null;
+if (previewOverlay) {
+  previewOverlay.style.display = currentPreviewUrl ? 'flex' : 'none';
+}
+
 if (track.id && track.id !== lastTrackId) {
   lastTrackId = track.id;
+  if (previewAudio && !previewAudio.paused) {
+    previewAudio.pause();
+    setPreviewPlaybackState(false);
+  }
   fetchAudioFeatures(track.id).then(features => {
     if (features && features.tempo) {
       currentBpm = features.tempo;
@@ -921,6 +1018,12 @@ statusText.innerText = 'Spotify';
 eqIcon.style.display = 'none';
 progressBar.style.width = '0%';
 currentBpm = 120;
+currentPreviewUrl = null;
+if (previewOverlay) previewOverlay.style.display = 'none';
+if (previewAudio && !previewAudio.paused) {
+  previewAudio.pause();
+  setPreviewPlaybackState(false);
+}
 document.documentElement.style.setProperty('--bpm-speed-mult', '1');
 if (mainSoundWave) mainSoundWave.classList.add('flatline');
 }
