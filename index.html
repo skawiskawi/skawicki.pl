@@ -572,7 +572,8 @@
       const strobeContainer = document.getElementById('strobe-container');
       if (strobeContainer) {
         function triggerMultiFlash() {
-          const count = Math.floor(Math.random() * 3) + 2;
+          // ZMIANA: 2x więcej błysków (4 do 8 w pojedynczej serii)
+          const count = (Math.floor(Math.random() * 3) + 2) * 2;
           const elements = [];
 
           for (let i = 0; i < count; i++) {
@@ -604,11 +605,11 @@
             });
           }, flashDuration);
 
-          // Zmieniono na sztywne 2000ms
-          setTimeout(triggerMultiFlash, 2000);
+          // ZMIANA: 2x częściej (interwał zmniejszony z 2000ms na 1000ms)
+          setTimeout(triggerMultiFlash, 1000);
         }
 
-        setTimeout(triggerMultiFlash, 1500);
+        setTimeout(triggerMultiFlash, 750);
       }
 
       function extractTwoColors(imgElement) {
