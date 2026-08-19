@@ -1,6 +1,6 @@
 # skawiskawi.pl
 
-Minimal personal link hub with live Spotify status and interactive background.
+The project focuses on creating a high-performance, single-file landing page utilizing glassmorphism aesthetics, dynamic neon accents, and interactive elements like a Spotify widget with real-time status updates. Security improvements are highlighted through the migration of sensitive API credentials to server-side environment variables on Cloudflare Pages. Technical discussions also cover the integration of Umami Analytics for privacy-focused event tracking and the implementation of social links for platforms like Telegram. Furthermore, the logs provide solutions for common Git version control issues, such as resolving merge conflicts and updating remote repository URLs. Regular design adjustments are documented, including the addition and subsequent removal of audio preview features to maintain a clean minimalist user interface.
 
 ## Features
 
