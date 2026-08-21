@@ -1,4 +1,4 @@
-<!-- v1.0.5 -->
+<!-- v1.1.0 -->
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -99,12 +99,12 @@ max-width: 310px;
 display: flex;
 flex-direction: column;
 align-items: center;
-gap: clamp(10px, 1.8vh, 16px);
+gap: clamp(12px, 2vh, 18px);
 margin: auto 0;
 }
 .sound-wave-container {
 width: 100%;
-height: 80px;
+height: 52px;
 display: flex;
 align-items: center;
 justify-content: center;
@@ -113,15 +113,14 @@ user-select: none;
 transition: opacity 0.5s ease;
 animation: stagger-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 animation-delay: 0.05s;
--webkit-mask-image: radial-gradient(ellipse 80% 60% at center, rgba(0,0,0,1) 25%, rgba(0,0,0,0) 100%);
-mask-image: radial-gradient(ellipse 80% 60% at center, rgba(0,0,0,1) 25%, rgba(0,0,0,0) 100%);
-overflow: visible;
+-webkit-mask-image: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 20%, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%);
+mask-image: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 20%, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%);
 }
 #soundwave-canvas {
 width: 100%;
 height: 100%;
 display: block;
-filter: drop-shadow(0 0 12px var(--dynamic-accent));
+filter: drop-shadow(0 0 16px var(--dynamic-accent));
 transition: filter 0.8s ease;
 }
 .links-wrapper {
@@ -488,7 +487,7 @@ GitHub
 </a>
 <div class="contact-wrapper">
 <a href="https://t.me/pawulonrulon" target="_blank" rel="noopener noreferrer" class="contact-icon-btn tilt-card" title="Napisz na Telegramie" aria-label="Telegram" data-umami-event="click-telegram">
-<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.05-.2-.06-.05-.16-.03-.24-.02-.11.02-1.79 1.14-5.06 3.35-.48.33-.91.49-1.3.48-.43-.01-1.25-.24-1.86-.44-.75-.24-1.35-.37-1.3-.78.03-.21.32-.43.89-.66 3.5-1.52 5.83-2.53 7-3.01 3.33-1.39 4.02-1.63 4.48-1.64.1 0 .32.02.47.14.12.1.16.24.17.34 0 .07.01.21 0 .28z"/></svg>
+<svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
 </a>
 </div>
 </div>
@@ -655,14 +654,14 @@ const waveCanvas = document.getElementById('soundwave-canvas');
 if (waveCanvas) {
   const wCtx = waveCanvas.getContext('2d');
   let wWidth = 310;
-  let wHeight = 80;
+  let wHeight = 52;
   let dpr = window.devicePixelRatio || 1;
 
   function resizeWaveCanvas() {
     dpr = window.devicePixelRatio || 1;
     const rect = waveCanvas.getBoundingClientRect();
     wWidth = rect.width || 310;
-    wHeight = rect.height || 80;
+    wHeight = rect.height || 52;
     waveCanvas.width = Math.round(wWidth * dpr);
     waveCanvas.height = Math.round(wHeight * dpr);
     wCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -673,16 +672,16 @@ if (waveCanvas) {
   let wavePhase1 = 0;
   let wavePhase2 = 0;
   let wavePhase3 = 0;
-  let currentAmp = 0;
+  let currentAmp = 0; 
   let ekgTime = 0;
 
   function getEkgSpike(norm) {
     if (Math.abs(norm) > 1) return 0;
-    const r = Math.exp(-(norm * norm) * 140) * 16;
-    const q = -Math.exp(-((norm + 0.09) * (norm + 0.09)) * 200) * 4;
-    const s = -Math.exp(-((norm - 0.09) * (norm - 0.09)) * 180) * 5.5;
-    const p = Math.exp(-((norm + 0.32) * (norm + 0.32)) * 40) * 2.5;
-    const t = Math.exp(-((norm - 0.35) * (norm - 0.35)) * 28) * 3;
+    const r = Math.exp(-(norm * norm) * 140) * 18;
+    const q = -Math.exp(-((norm + 0.09) * (norm + 0.09)) * 200) * 4.5;
+    const s = -Math.exp(-((norm - 0.09) * (norm - 0.09)) * 180) * 6.5;
+    const p = Math.exp(-((norm + 0.32) * (norm + 0.32)) * 40) * 2.8;
+    const t = Math.exp(-((norm - 0.35) * (norm - 0.35)) * 28) * 3.5;
     return r + q + s + p + t;
   }
 
@@ -707,20 +706,20 @@ if (waveCanvas) {
       wCtx.beginPath();
       for (let x = 0; x <= wWidth; x += 2) {
         const envelope = Math.sin((x / wWidth) * Math.PI) ** 1.3;
-        const y = centerY - (Math.sin(x * 0.032 + wavePhase3) * 7 + Math.cos(x * 0.015 - wavePhase3 * 0.7) * 4) * envelope * currentAmp;
+        const y = centerY - (Math.sin(x * 0.032 + wavePhase3) * 8 + Math.cos(x * 0.015 - wavePhase3 * 0.7) * 5) * envelope * currentAmp;
         if (x === 0) wCtx.moveTo(x, y);
         else wCtx.lineTo(x, y);
       }
       const grad3 = wCtx.createLinearGradient(0, 0, wWidth, 0);
       grad3.addColorStop(0, 'rgba(0, 0, 0, 0)');
-      grad3.addColorStop(0.20, isGrayscale ? 'rgba(200, 200, 200, 0.25)' : `hsla(${currentHue1}, 90%, 75%, ${0.35 * currentAmp})`);
-      grad3.addColorStop(0.80, isGrayscale ? 'rgba(200, 200, 200, 0.25)' : `hsla(${currentHue1}, 90%, 75%, ${0.35 * currentAmp})`);
+      grad3.addColorStop(0.18, isGrayscale ? 'rgba(200, 200, 200, 0.25)' : `hsla(${currentHue1}, 90%, 75%, ${0.35 * currentAmp})`);
+      grad3.addColorStop(0.82, isGrayscale ? 'rgba(200, 200, 200, 0.25)' : `hsla(${currentHue1}, 90%, 75%, ${0.35 * currentAmp})`);
       grad3.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
       wCtx.strokeStyle = grad3;
       wCtx.lineWidth = 1.6;
       wCtx.shadowColor = accent1;
-      wCtx.shadowBlur = 6;
+      wCtx.shadowBlur = 8;
       wCtx.stroke();
       wCtx.restore();
 
@@ -728,20 +727,20 @@ if (waveCanvas) {
       wCtx.beginPath();
       for (let x = 0; x <= wWidth; x += 2) {
         const envelope = Math.sin((x / wWidth) * Math.PI) ** 1.2;
-        const y = centerY - (Math.sin(x * 0.020 - wavePhase2 + 1.2) * 10 + Math.cos(x * 0.035 + wavePhase2 * 0.6) * 5) * envelope * currentAmp;
+        const y = centerY - (Math.sin(x * 0.020 - wavePhase2 + 1.2) * 12 + Math.cos(x * 0.035 + wavePhase2 * 0.6) * 6) * envelope * currentAmp;
         if (x === 0) wCtx.moveTo(x, y);
         else wCtx.lineTo(x, y);
       }
       const grad2 = wCtx.createLinearGradient(0, 0, wWidth, 0);
       grad2.addColorStop(0, 'rgba(0, 0, 0, 0)');
-      grad2.addColorStop(0.18, isGrayscale ? 'rgba(255, 255, 255, 0.4)' : `hsla(${currentHue2}, 85%, 65%, ${0.65 * currentAmp})`);
-      grad2.addColorStop(0.82, isGrayscale ? 'rgba(255, 255, 255, 0.4)' : `hsla(${currentHue2}, 85%, 65%, ${0.65 * currentAmp})`);
+      grad2.addColorStop(0.15, isGrayscale ? 'rgba(255, 255, 255, 0.4)' : `hsla(${currentHue2}, 85%, 65%, ${0.65 * currentAmp})`);
+      grad2.addColorStop(0.85, isGrayscale ? 'rgba(255, 255, 255, 0.4)' : `hsla(${currentHue2}, 85%, 65%, ${0.65 * currentAmp})`);
       grad2.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
       wCtx.strokeStyle = grad2;
-      wCtx.lineWidth = 2.0;
+      wCtx.lineWidth = 2.2;
       wCtx.shadowColor = accent2;
-      wCtx.shadowBlur = 10;
+      wCtx.shadowBlur = 12;
       wCtx.stroke();
       wCtx.restore();
 
@@ -756,14 +755,14 @@ if (waveCanvas) {
       wCtx.beginPath();
       for (let x = 0; x <= wWidth; x += 2) {
         const envelope = Math.sin((x / wWidth) * Math.PI) ** 1.1;
-        const y = centerY - (Math.sin(x * 0.024 + wavePhase1) * Math.cos(x * 0.012 + wavePhase1 * 0.6) * 13 + Math.sin(x * 0.048 - wavePhase1 * 1.1) * 3) * envelope * currentAmp;
+        const y = centerY - (Math.sin(x * 0.024 + wavePhase1) * Math.cos(x * 0.012 + wavePhase1 * 0.6) * 16 + Math.sin(x * 0.048 - wavePhase1 * 1.1) * 4) * envelope * currentAmp;
         if (x === 0) wCtx.moveTo(x, y);
         else wCtx.lineTo(x, y);
       }
       wCtx.strokeStyle = waveGrad;
-      wCtx.lineWidth = 2.6;
+      wCtx.lineWidth = 2.8;
       wCtx.shadowColor = accent1;
-      wCtx.shadowBlur = 12;
+      wCtx.shadowBlur = 16;
       wCtx.stroke();
       wCtx.restore();
     }
@@ -795,13 +794,13 @@ if (waveCanvas) {
           if (Math.abs(dx) <= windowHalf) {
             const norm = dx / windowHalf;
             ekgOffset = getEkgSpike(norm) * flatlineWeight;
-            if (ekgOffset > 8) {
+            if (ekgOffset > 10) {
               activePeakX = x;
               activePeakY = centerY - ekgOffset;
             }
           }
         }
-        const tremor = Math.sin(ekgTime * 10 + x * 0.08) * 0.35 * flatlineWeight;
+        const tremor = Math.sin(ekgTime * 10 + x * 0.08) * 0.4 * flatlineWeight;
         const y = centerY - ekgOffset + tremor;
 
         if (x === 0) wCtx.moveTo(x, y);
@@ -810,23 +809,23 @@ if (waveCanvas) {
 
       const flatGrad = wCtx.createLinearGradient(0, 0, wWidth, 0);
       flatGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
-      flatGrad.addColorStop(0.20, `hsla(${currentHue1}, 70%, 55%, ${0.25 * flatlineWeight})`);
+      flatGrad.addColorStop(0.18, `hsla(${currentHue1}, 70%, 55%, ${0.25 * flatlineWeight})`);
       flatGrad.addColorStop(0.5, `hsla(0, 0%, 100%, ${0.85 * flatlineWeight})`);
-      flatGrad.addColorStop(0.80, `hsla(${currentHue2}, 70%, 55%, ${0.25 * flatlineWeight})`);
+      flatGrad.addColorStop(0.82, `hsla(${currentHue2}, 70%, 55%, ${0.25 * flatlineWeight})`);
       flatGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
       wCtx.strokeStyle = flatGrad;
       wCtx.lineWidth = 1.8;
       wCtx.shadowColor = accent1;
-      wCtx.shadowBlur = 8;
+      wCtx.shadowBlur = 10;
       wCtx.stroke();
 
       if (activePeakX > 0 && activePeakX < wWidth) {
         wCtx.beginPath();
-        wCtx.arc(activePeakX, activePeakY, 2.2, 0, Math.PI * 2);
+        wCtx.arc(activePeakX, activePeakY, 2.5, 0, Math.PI * 2);
         wCtx.fillStyle = '#ffffff';
         wCtx.shadowColor = '#ffffff';
-        wCtx.shadowBlur = 10;
+        wCtx.shadowBlur = 14;
         wCtx.fill();
       }
       wCtx.restore();
@@ -944,8 +943,9 @@ tiltCards.forEach(card => {
 async function getSpotifyStatus() {
   try {
     const res = await fetch('/api/spotify');
-    if (res.ok) {
-      return await res.json();
+    if (res.status === 200) {
+      const text = await res.text();
+      return text ? JSON.parse(text) : { isPlaying: false, isRecentlyPlayed: false };
     }
     return { isPlaying: false, isRecentlyPlayed: false };
   } catch (err) {
