@@ -11,9 +11,9 @@ const CORS_HEADERS = {
 };
 
 async function getAccessToken(env) {
-  const clientId = env.SPOTIFY_CLIENT_ID;
-  const clientSecret = env.SPOTIFY_CLIENT_SECRET;
-  const refreshToken = env.SPOTIFY_REFRESH_TOKEN;
+  const clientId = env.SPOTIFY_CLIENT_ID?.trim();
+  const clientSecret = env.SPOTIFY_CLIENT_SECRET?.trim();
+  const refreshToken = env.SPOTIFY_REFRESH_TOKEN?.trim();
 
   if (!clientId || !clientSecret || !refreshToken) {
     throw new Error('Missing Spotify environment variables');
@@ -29,11 +29,12 @@ async function getAccessToken(env) {
     body: new URLSearchParams({
       grant_type: 'refresh_token',
       refresh_token: refreshToken
-    })
+    }).toString()
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to refresh token: ${response.status}`);
+    const errorDetails = await response.text();
+    throw new Error(`Failed to refresh token: ${response.status} - ${errorDetails}`);
   }
 
   const data = await response.json();
