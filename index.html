@@ -1,4 +1,4 @@
-<!-- version: 3 -->
+<!-- version: 4 -->
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -37,7 +37,8 @@ color: var(--text-main);
 overflow-y: auto;
 overflow-x: hidden;
 }
-#spotify-bg-blur {
+/* System Double Buffer dla tła */
+.spotify-bg-blur {
 position: fixed;
 top: -10%;
 left: -10%;
@@ -51,7 +52,7 @@ opacity: 0;
 z-index: 0;
 pointer-events: none;
 transition: opacity 1.5s ease;
-will-change: opacity, background-image;
+will-change: opacity;
 }
 #interactive-bg, #strobe-container {
 position: fixed;
@@ -440,7 +441,8 @@ padding-left: 6px;
 </style>
 </head>
 <body>
-<div id="spotify-bg-blur"></div>
+<div class="spotify-bg-blur" id="spotify-bg-1"></div>
+<div class="spotify-bg-blur" id="spotify-bg-2"></div>
 <div class="noise-overlay"></div>
 <canvas id="interactive-bg"></canvas>
 <div id="strobe-container"></div>
@@ -520,6 +522,10 @@ let isGrayscale = false;
 let lastTrackId = null;
 let currentBpm = 120;
 let isMusicActive = false;
+
+// Double buffer logic state
+let activeBgBuffer = 1;
+let currentBgUrl = '';
 
 /* ==========================================================================
    INTERACTIVE BACKGROUND CANVAS
@@ -729,7 +735,6 @@ if (waveCanvas) {
     const drawEnd = cssWidth + waveBufferPadding / 2;
 
     if (currentAmp > 0.01) {
-      // Wave 3
       wCtx.save();
       wCtx.shadowColor = accent1;
       wCtx.shadowBlur = 8;
@@ -754,7 +759,6 @@ if (waveCanvas) {
       wCtx.stroke();
       wCtx.restore();
 
-      // Wave 2
       wCtx.save();
       wCtx.shadowColor = accent2;
       wCtx.shadowBlur = 12;
@@ -778,7 +782,6 @@ if (waveCanvas) {
       wCtx.stroke();
       wCtx.restore();
 
-      // Wave 1
       wCtx.save();
       wCtx.shadowColor = accent1;
       wCtx.shadowBlur = 16;
@@ -1011,7 +1014,6 @@ async function updateSpotifyCard() {
   if (track.title) {
     if (track.id && track.id !== lastTrackId) {
       lastTrackId = track.id;
-      // Pobieramy tempo wygenerowane i dostarczone przez nasz bezpieczny backend API
       currentBpm = track.tempo || 120;
       const speedMultiplier = Math.max(0.45, Math.min(1.8, 120 / currentBpm));
       document.documentElement.style.setProperty('--bpm-speed-mult', speedMultiplier.toFixed(2));
@@ -1021,11 +1023,20 @@ async function updateSpotifyCard() {
       cover.dataset.rawSrc = track.albumImageUrl;
       cover.src = track.albumImageUrl;
 
-      // Aktualizacja zamazanego tła Spotify
-      const bgBlur = document.getElementById('spotify-bg-blur');
-      if (bgBlur) {
-        bgBlur.style.backgroundImage = `url('${track.albumImageUrl}')`;
-        bgBlur.style.opacity = '0.15';
+      // LOGIKA DOUBLE BUFFER
+      if (currentBgUrl !== track.albumImageUrl) {
+        currentBgUrl = track.albumImageUrl;
+        const nextBuffer = activeBgBuffer === 1 ? 2 : 1;
+        const bgNext = document.getElementById(`spotify-bg-${nextBuffer}`);
+        const bgCurrent = document.getElementById(`spotify-bg-${activeBgBuffer}`);
+        
+        if (bgNext && bgCurrent) {
+          bgNext.style.backgroundImage = `url('${track.albumImageUrl}')`;
+          bgNext.style.opacity = '0.15'; // Pokazujemy nowy bufor
+          bgCurrent.style.opacity = '0'; // Ukrywamy stary bufor
+          
+          activeBgBuffer = nextBuffer; // Aktualizujemy wskazanie na aktywny bufor
+        }
       }
 
       extractPaletteFromUrl(track.albumImageUrl).then(colors => {
@@ -1072,9 +1083,12 @@ async function updateSpotifyCard() {
     document.documentElement.style.setProperty('--bpm-speed-mult', '1');
     isMusicActive = false;
 
-    // Ukrycie rozmytego tła przy braku aktywności
-    const bgBlur = document.getElementById('spotify-bg-blur');
-    if (bgBlur) bgBlur.style.opacity = '0';
+    // Ukrycie obu teł przy braku aktywności
+    const bg1 = document.getElementById('spotify-bg-1');
+    const bg2 = document.getElementById('spotify-bg-2');
+    if (bg1) bg1.style.opacity = '0';
+    if (bg2) bg2.style.opacity = '0';
+    currentBgUrl = ''; // reset, żeby nowy utwór załadował się poprawnie
   }
 }
 updateSpotifyCard();
